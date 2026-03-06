@@ -1,585 +1,696 @@
-# statuses
-SPEC.md
+# Domestic Status Logger – Specification
 
-Domestic Dashboard & Analytics Platform
+## 1. Overview
 
-1. Overview
+The **Domestic Status Logger** is a lightweight web application for recording everyday domestic activities as timestamped events.
 
-This specification defines the architecture, data models, UI, analytics insights, and logging system for a Domestic Dashboard Analytics Application.
+The system is designed to be:
 
-The application provides:
-	•	A Domestic Operations Dashboard
-	•	Analytics & Insights
-	•	Status Tracking
-	•	Structured Logging and Observability
-	•	Event-driven architecture
+* extremely quick to use
+* easy to deploy
+* simple to maintain
+* fully supported by **Netlify serverless infrastructure**
 
-The system is intended to support operational monitoring, analytics exploration, and debugging of domestic workflows.
+The core idea is that the user logs **Statuses**, which represent activities or conditions. Each log entry records:
 
-⸻
+* a **timestamp**
+* a **status**
+* an optional **numeric value**
 
-2. System Goals
+Example logs:
 
-Primary Objectives
-	1.	Provide a central dashboard for domestic system operations.
-	2.	Deliver analytics insights about usage and performance.
-	3.	Maintain real-time status tracking for system entities.
-	4.	Enable traceability and debugging using structured logging.
-	5.	Support scalable analytics and observability.
+```
+20:14 Cooked dinner
+20:25 Washed dishes
+20:40 Read book (mins) 10
+21:10 Water (ml) 250
+```
 
-⸻
+The system supports both:
 
-3. High-Level Architecture
+* **Simple statuses** (timestamp only)
+* **Value statuses** (timestamp + numeric measurement)
 
-                ┌─────────────────────────┐
-                │       Frontend UI        │
-                │   Domestic Dashboard     │
-                └───────────┬──────────────┘
-                            │
-                            ▼
-                ┌─────────────────────────┐
-                │        API Layer         │
-                │  Dashboard / Analytics   │
-                └───────────┬──────────────┘
-                            │
-        ┌───────────────────┼───────────────────┐
-        ▼                   ▼                   ▼
- ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
- │ Status Store │   │ Event Stream │   │ Log Pipeline │
- │  (Postgres)  │   │ (Kafka)      │   │ (OpenTelemetry)│
- └──────────────┘   └──────────────┘   └──────────────┘
-        │                   │                   │
-        ▼                   ▼                   ▼
- ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
- │ Analytics DB │   │ Data Lake    │   │ Observability │
- │ (Warehouse)  │   │              │   │ (ELK/Grafana) │
- └──────────────┘   └──────────────┘   └──────────────┘
+The application prioritises:
 
+1. **Fast homepage logging**
+2. **Large built-in status library**
+3. **Minimal configuration**
+4. **Simple analytics from accumulated logs**
 
-⸻
+---
 
-4. Frontend Dashboard UI
+# 2. Core Concepts
 
-Dashboard Layout
+## Status
 
-The Domestic Dashboard consists of several primary UI sections.
-
----------------------------------------------------
-Top Navigation
----------------------------------------------------
-
-KPI Summary Cards
-
----------------------------------------------------
-Charts / Analytics Panels
----------------------------------------------------
-
-Operational Status Table
-
----------------------------------------------------
-Event Logs / Activity Feed
----------------------------------------------------
-
-
-⸻
-
-4.1 Navigation
-
-Main navigation includes:
-	•	Dashboard
-	•	Analytics
-	•	Entities
-	•	Logs
-	•	Settings
-
-⸻
-
-4.2 KPI Summary Cards
-
-Displays key operational metrics.
-
-Example metrics:
-
-Metric	Description
-Total Entities	Total items in system
-Active Jobs	Jobs currently processing
-Failures	Total failed jobs
-Success Rate	Completion rate
-Avg Processing Time	Average task duration
-
-Example UI:
-
-[ Total Entities ]
-[ Active Jobs ]
-[ Failures ]
-[ Success Rate ]
-
-
-⸻
-
-4.3 Analytics Panels
-
-Visual components displaying system insights.
+A **Status** is a predefined activity that can be logged.
 
 Examples:
-	•	Requests over time
-	•	Success vs failure rates
-	•	System throughput
-	•	Latency distribution
-	•	Worker utilization
 
-Charts:
-	•	Line charts
-	•	Bar charts
-	•	Heatmaps
-	•	Pie charts
+```
+Cooked dinner
+Cleaned kitchen
+Read book (mins)
+Water (ml)
+Walk (mins)
+```
 
-⸻
+Statuses belong to a **Motive category** and may optionally include a numeric value.
 
-4.4 Operational Status Table
+---
 
-Shows live system entities.
+## Log Entry
 
-Columns:
-
-Column	Description
-Entity ID	Unique identifier
-Type	Entity type
-Status	Current status
-Updated	Last update time
-Owner	Service or user
-Metadata	Additional info
+A **Log Entry** records when a status occurs.
 
 Example:
 
-Entity ID | Type | Status | Updated
---------------------------------------
-123       | Job  | RUNNING | 10:04
-124       | Job  | FAILED  | 10:01
+```
+timestamp: 2026-03-06 20:15
+status: read_book
+value: 10
+```
 
+For simple statuses:
 
-⸻
+```
+timestamp: 2026-03-06 20:05
+status: cleaned_kitchen
+```
 
-4.5 Event Activity Feed
+---
 
-Displays recent events and transitions.
+## Motive
+
+A **Motive** groups statuses based on purpose.
+
+Examples:
+
+* Domestic Maintenance
+* Food
+* Wellbeing
+* Productivity
+* Leisure
+* Social
+
+Motives organise the status library and allow simple analytics.
+
+---
+
+# 3. Status Types
+
+## 3.1 Simple Status
+
+A simple status records only a timestamp.
 
 Example:
 
-10:05 Job 123 STARTED
-10:06 Job 123 FAILED
-10:07 Job 124 STARTED
+```
+Cleaned kitchen
+```
 
+Log entry:
 
-⸻
+```
+timestamp: 20:15
+status: cleaned_kitchen
+```
 
-5. Analytics Insights
+These are used for discrete events.
 
-Analytics components provide operational insights.
+Examples:
 
-Key Insights
+* Cooked dinner
+* Showered
+* Took bins out
+* Paid bill
 
-1. System Health
+---
 
-Metrics:
-	•	success rate
-	•	failure rate
-	•	retry rate
+## 3.2 Value Status
 
-Visualization:
-	•	stacked bar charts
-	•	percentage indicators
+A value status records a timestamp **plus a numeric value**.
 
-⸻
+Example status definitions:
 
-2. Throughput
+```
+Read book (mins)
+Water (ml)
+Walk (mins)
+Coffee (cups)
+```
 
-Measures system performance.
+Example logs:
 
-Metrics:
-	•	requests per minute
-	•	jobs processed per hour
-	•	peak load periods
+```
+Read book (mins) 10
+Water (ml) 250
+Walk (mins) 30
+```
 
-Visualization:
-	•	time series charts
+These enable simple quantitative analytics.
 
-⸻
+---
 
-3. Latency Analysis
+# 4. Default Values
 
-Track performance.
+Value statuses include a **default value**.
 
-Metrics:
-	•	average processing time
-	•	p95 latency
-	•	p99 latency
+This enables **one-click logging**.
 
-Visualization:
-	•	distribution graphs
-	•	box plots
+Example definitions:
 
-⸻
+```
+Read book (mins) → default 10
+Water (ml) → default 250
+Milk (ml) → default 150
+Walk (mins) → default 20
+Coffee (cups) → default 1
+```
 
-4. Failure Analysis
+### Logging Behaviour
 
-Identify system problems.
+When the user clicks a value status:
 
-Metrics:
-	•	failures by reason
-	•	failures by service
-	•	failures over time
+```
+Read book (mins)
+```
 
-⸻
+The system logs:
 
-5. Operational Insights
+```
+Read book 10 mins
+```
 
-Example derived insights:
-	•	busiest time of day
-	•	most common failure reason
-	•	average retries per job
-	•	service reliability
+The value can optionally be adjusted before saving.
 
-⸻
+---
 
-6. Status Data Model
+# 5. Homepage Logging Interface
 
-The Status Data Model represents the current state of system entities.
+The homepage is the **primary interaction surface**.
 
-Entities can represent:
-	•	jobs
-	•	workflows
-	•	tasks
-	•	requests
+Design goals:
 
-⸻
+* extremely fast logging
+* minimal friction
+* clear visual organisation
 
-6.1 EntityStatus Table
+## Layout
 
-EntityStatus
--------------
-id (UUID)
-entity_id (UUID)
-entity_type (string)
+### Search Bar
 
-status (enum)
-status_reason (string)
+Allows quick discovery of statuses.
 
-updated_at (timestamp)
-updated_by (string/service)
+```
+Search statuses...
+```
 
-version (int)
-metadata (jsonb)
+---
 
+### Status Grid
 
-⸻
+Grid of commonly used statuses.
 
-6.2 Status Enum
+Example:
 
-PENDING
-PROCESSING
-SUCCEEDED
-FAILED
-CANCELLED
-RETRYING
+```
+[ Cooked dinner ]
+[ Cleaned kitchen ]
+[ Read book 10m ]
+[ Walk 20m ]
+[ Water 250ml ]
+[ Made coffee ]
+```
 
+Behaviour:
 
-⸻
+* **Simple status:** logs immediately
+* **Value status:** logs using default value
 
-6.3 Example Row
+---
 
-entity_id	entity_type	status	updated_at
-123	job	PROCESSING	10:05
+### Recent Activity
 
+Shows the most recent log entries.
 
-⸻
+Example:
 
-7. Status Transition Model
+```
+20:14 Cooked dinner
+20:25 Washed dishes
+20:40 Read book 10m
+21:10 Water 250ml
+```
 
-Tracks historical state changes.
+---
 
-StatusTransition
-----------------
-id (UUID)
+# 6. Status Library
 
-entity_id (UUID)
+The system includes a **large built-in library (~100 statuses)**.
 
-from_status (enum)
-to_status (enum)
+Users can:
 
-trigger (string)
-reason (string)
+* enable or disable statuses
+* reorder statuses
+* add custom statuses
+* move statuses between motives
 
-timestamp (timestamp)
-actor (user/service)
+---
 
-correlation_id (UUID)
+# 7. Built-In Status Library
 
+## 7.1 Domestic Maintenance
 
-⸻
+Kitchen:
 
-Example
+```
+Cleaned kitchen — simple
+Washed dishes — simple
+Loaded dishwasher — simple
+Unloaded dishwasher — simple
+Wiped surfaces — simple
+Took bins out — simple
+```
 
-from	to	trigger
-PENDING	PROCESSING	worker-start
-PROCESSING	FAILED	timeout
+General cleaning:
 
+```
+Tidied house — simple
+Vacuumed — simple
+Mopped floor — simple
+Dusted — simple
+Cleaned bathroom — simple
+Cleaned toilet — simple
+Cleaned shower — simple
+Changed bedding — simple
+```
 
-⸻
+Laundry:
 
-8. Logging Architecture
+```
+Started laundry — simple
+Hung laundry — simple
+Folded laundry — simple
+Put laundry away — simple
+```
 
-Logs capture system events and diagnostics.
+---
 
-Logs must be structured JSON.
+## 7.2 Food
 
-⸻
+Cooking:
 
-LogEvent Schema
+```
+Cooked breakfast — simple
+Cooked lunch — simple
+Cooked dinner — simple
+Prepared snack — simple
+Baked — simple
+Meal prep — simple
+```
 
-LogEvent
----------
+Eating:
+
+```
+Ate breakfast — simple
+Ate lunch — simple
+Ate dinner — simple
+Ate snack — simple
+Takeaway meal — simple
+Restaurant meal — simple
+```
+
+Drinks:
+
+```
+Water (ml) — value — default 250
+Milk (ml) — value — default 150
+Juice (ml) — value — default 200
+Tea (cups) — value — default 1
+Coffee (cups) — value — default 1
+Alcohol (units) — value — default 1
+```
+
+---
+
+## 7.3 Shopping
+
+```
+Grocery shopping — simple
+Online grocery order — simple
+Household supplies shopping — simple
+Pharmacy visit — simple
+Received delivery — simple
+```
+
+---
+
+## 7.4 Personal Wellbeing
+
+Hygiene:
+
+```
+Showered — simple
+Bath — simple
+Brushed teeth — simple
+Skincare — simple
+Hair wash — simple
+```
+
+Health tracking:
+
+```
+Weight (kg) — value — default 75
+Steps — value — default 1000
+Water intake (ml) — value — default 250
+```
+
+---
+
+## 7.5 Exercise
+
+```
+Walk (mins) — value — default 20
+Run (mins) — value — default 20
+Cycle (mins) — value — default 30
+Workout (mins) — value — default 30
+Stretching (mins) — value — default 10
+Yoga (mins) — value — default 20
+Gym session — simple
+Sports activity (mins) — value — default 45
+```
+
+---
+
+## 7.6 Productivity
+
+```
+Worked on job (mins) — value — default 30
+Deep work (mins) — value — default 30
+Admin tasks (mins) — value — default 20
+Emails — simple
+Planning — simple
+Studied (mins) — value — default 30
+Side project (mins) — value — default 30
+Learning (mins) — value — default 20
+```
+
+---
+
+## 7.7 Reading & Media
+
+```
+Read book (mins) — value — default 10
+Read article — simple
+News reading (mins) — value — default 10
+Podcast (mins) — value — default 20
+Audiobook (mins) — value — default 20
+```
+
+---
+
+## 7.8 Leisure
+
+```
+Watched TV (mins) — value — default 30
+Movie — simple
+YouTube (mins) — value — default 20
+Video game (mins) — value — default 30
+Browsing internet (mins) — value — default 15
+Social media (mins) — value — default 10
+Music listening (mins) — value — default 20
+```
+
+---
+
+## 7.9 Social
+
+```
+Called friend — simple
+Called family — simple
+Met friend — simple
+Hosted guest — simple
+Visited someone — simple
+Event attended — simple
+```
+
+---
+
+## 7.10 Sleep
+
+```
+Went to bed — simple
+Woke up — simple
+Sleep (hours) — value — default 7
+Nap (mins) — value — default 20
+```
+
+---
+
+## 7.11 Home Admin
+
+```
+Paid bill — simple
+Budgeting — simple
+House admin (mins) — value — default 20
+Booking appointment — simple
+Maintenance task — simple
+```
+
+---
+
+## 7.12 Outdoor / Errands
+
+```
+Went outside — simple
+Commute — simple
+Walked outside (mins) — value — default 20
+Errands run — simple
+Park visit — simple
+```
+
+---
+
+# 8. Data Model
+
+## Motive
+
+```
+Motive
+- id
+- name
+- order
+```
+
+---
+
+## Status
+
+```
+Status
+- id
+- label
+- motive_id
+- type ("simple" | "value")
+- unit (optional)
+- default_value (optional)
+- enabled
+- order
+```
+
+Example:
+
+```
+id: read_book
+label: Read book
+type: value
+unit: mins
+default_value: 10
+motive_id: leisure
+```
+
+---
+
+## Log Entry
+
+```
+LogEntry
+- id
+- status_id
+- timestamp
+- value (optional)
+```
+
+Examples:
+
+Simple status:
+
+```
+status: cleaned_kitchen
+timestamp: 20:15
+```
+
+Value status:
+
+```
+status: read_book
+timestamp: 21:00
+value: 10
+```
+
+---
+
+# 9. Analytics
+
+Basic analytics derived from logs.
+
+## Daily Summary
+
+Example:
+
+```
+Today
+
+Domestic
+- Cleaned kitchen
+- Washed dishes
+
+Food
+- Cooked dinner
+- Water 750ml
+
+Leisure
+- Read book 30 mins
+```
+
+---
+
+## Weekly Totals
+
+Example:
+
+```
+Read book: 220 mins
+Walk: 150 mins
+Water: 6000 ml
+```
+
+---
+
+## Status Counts
+
+Simple statuses counted:
+
+```
+Cooked dinner — 5
+Cleaned kitchen — 3
+Showered — 7
+```
+
+---
+
+# 10. Netlify Architecture
+
+The entire application must run using **Netlify infrastructure**.
+
+## Frontend
+
+Static web application.
+
+Possible frameworks:
+
+* React
+* Svelte
+* Vue
+
+Hosted on Netlify.
+
+---
+
+## Backend
+
+Serverless functions.
+
+Endpoints:
+
+```
+GET /statuses
+GET /logs
+POST /log
+GET /summary
+```
+
+---
+
+## Storage
+
+Simple JSON or Netlify database.
+
+Collections:
+
+```
+motives.json
+statuses.json
+logs.json
+```
+
+---
+
+# 11. Logging Flow
+
+```
+User clicks status
+↓
+Frontend sends POST /log
+↓
+Netlify Function stores log entry
+↓
+Frontend displays success confirmation
+```
+
+Example confirmation:
+
+```
+✓ Logged: Read book 10 mins
+```
+
+---
+
+# 12. Design Principles
+
+## Frictionless Logging
+
+Logging should require **one tap whenever possible**.
+
+---
+
+## Rich Default Library
+
+Users should be able to start using the app **without configuration**.
+
+---
+
+## Quantitative Insight
+
+Value statuses allow:
+
+* time tracking
+* hydration tracking
+* exercise tracking
+* activity measurement
+
+---
+
+## Simple Mental Model
+
+Every event is:
+
+```
 timestamp
-
-level
-service
-environment
-
-message
-
-trace_id
-span_id
-correlation_id
-
-entity_id
-entity_type
-
-event_type
-
-payload (json)
-
-host
-version
-
-
-⸻
-
-Example Log Event
-
-{
-  "timestamp": "2026-03-06T10:05:21Z",
-  "level": "INFO",
-  "service": "payment-service",
-  "event_type": "STATUS_CHANGED",
-  "entity_id": "123",
-  "from_status": "PENDING",
-  "to_status": "PROCESSING",
-  "trace_id": "abc123",
-  "payload": {
-    "worker": "processor-4"
-  }
-}
-
-
-⸻
-
-9. Event & Logging Flow
-
-When a status changes:
-
-1. Service processes request
-2. Status updated in database
-3. StatusTransition recorded
-4. LogEvent emitted
-5. Event optionally published to stream
-
-Example flow:
-
-API receives request
-      │
-      ▼
-Create entity
-      │
-status = PENDING
-      │
-log: ENTITY_CREATED
-      │
-worker picks task
-      │
-status = PROCESSING
-      │
-log: STATUS_CHANGED
-
-
-⸻
-
-10. Observability Architecture
-
-Application Services
-        │
-        │ emit logs/events
-        ▼
-Structured Logger
-        │
-        ▼
-Log Pipeline
-(FluentBit / Logstash / OpenTelemetry)
-        │
-        ├────────► Observability (Grafana / ELK)
-        │
-        ▼
-Event Stream
-(Kafka / PubSub / Kinesis)
-        │
-        ▼
-Event Store / Data Lake
-
-
-⸻
-
-11. Database Schema
-
-Entity Status
-
-CREATE TABLE entity_status (
-  entity_id UUID PRIMARY KEY,
-  entity_type TEXT,
-  status TEXT,
-  status_reason TEXT,
-  updated_at TIMESTAMP,
-  updated_by TEXT,
-  version INT,
-  metadata JSONB
-);
-
-
-⸻
-
-Status Transition
-
-CREATE TABLE status_transition (
-  id UUID PRIMARY KEY,
-  entity_id UUID,
-  from_status TEXT,
-  to_status TEXT,
-  trigger TEXT,
-  reason TEXT,
-  timestamp TIMESTAMP,
-  actor TEXT,
-  correlation_id UUID
-);
-
-
-⸻
-
-12. Observability Queries
-
-Failed Jobs
-
-SELECT *
-FROM entity_status
-WHERE status = 'FAILED';
-
-
-⸻
-
-Status History
-
-SELECT *
-FROM status_transition
-WHERE entity_id = '123'
-ORDER BY timestamp;
-
-
-⸻
-
-Debug Request
-
-Search logs using:
-
-trace_id = abc123
-
-
-⸻
-
-13. Event Sourcing (Optional Advanced Pattern)
-
-Instead of storing status directly, state can be derived from events.
-
-Example events:
-
-JOB_CREATED
-JOB_STARTED
-JOB_FAILED
-JOB_RETRIED
-JOB_SUCCEEDED
-
-Status can be reconstructed using:
-
-status = reduce(events)
-
-Benefits:
-	•	perfect audit history
-	•	replayable system state
-	•	analytics friendly
-
-Tradeoff:
-	•	increased architectural complexity.
-
-⸻
-
-14. Recommended Tech Stack
-
-Frontend
-	•	React
-	•	Next.js
-	•	Tailwind
-	•	Charting library (Recharts / Chart.js)
-
-⸻
-
-Backend
-	•	Node.js / Python
-	•	REST or GraphQL API
-
-⸻
-
-Data & Events
-	•	PostgreSQL (status storage)
-	•	Kafka / PubSub (event streaming)
-	•	Data warehouse for analytics
-
-⸻
-
-Observability
-	•	OpenTelemetry
-	•	FluentBit / Logstash
-	•	Elasticsearch
-	•	Grafana
-
-⸻
-
-15. Best Practices
-
-✔ Use structured JSON logs
-✔ Include trace_id, entity_id, correlation_id
-✔ Maintain immutable logs
-✔ Use status enums
-✔ Record all transitions
-✔ Avoid large payloads in logs
-✔ Version event schemas
-
-⸻
-
-16. Future Enhancements
-
-Potential improvements:
-	•	Real-time dashboard updates using WebSockets
-	•	ML anomaly detection on failures
-	•	Predictive scaling insights
-	•	Automatic alerting system
-	•	AI-powered incident summaries
-
-⸻
-
-END OF SPEC
+status
+(optional value)
+```
+
+This simplicity allows the system to scale without complexity.
