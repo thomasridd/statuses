@@ -1,0 +1,34 @@
+# Environment variables and secrets - MUST NOT be committed
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.crt
+
+# IDE and editor files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+
+# Dependency directories
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Claude Code auth data
+.claude-data/
