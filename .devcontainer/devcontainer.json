@@ -1,0 +1,47 @@
+{
+  "name": "Secure Dev Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "runArgs": [
+    "--cap-drop=ALL",
+    "--cap-add=NET_BIND_SERVICE"
+  ],
+  "mounts": [
+    "source=devcontainer-cache,target=/home/vscode/.cache,type=volume"
+  ],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, 8080],
+  "portsAttributes": {
+    "3000": {
+      "label": "Application",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "API",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+  "remoteEnv": {
+    "NODE_ENV": "development",
+    "NODE_EXTRA_CA_CERTS": "/usr/local/share/ca-certificates/zscaler-ca.crt",
+    "CLAUDE_HOME": "/workspace/.claude-data"
+  }
+}
