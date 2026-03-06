@@ -32,14 +32,38 @@ KAFKA_BROKER=localhost:9092
 ELASTICSEARCH_URL=http://localhost:9200
 ```
 
-## Deploying to Vercel
+## Deploying to Netlify
+
+The repo includes `netlify.toml` and `@netlify/plugin-nextjs` which handle all Next.js configuration automatically.
+
+### Option A — Netlify CLI
 
 ```bash
-npm i -g vercel
-vercel
+npm install -g netlify-cli
+netlify login
+netlify init      # link to a Netlify site
+netlify deploy --build --prod
 ```
 
-Vercel auto-detects Next.js — no additional configuration needed.
+### Option B — Git integration (recommended)
+
+1. Push this repo to GitHub/GitLab/Bitbucket.
+2. Go to [app.netlify.com](https://app.netlify.com) → **Add new site** → **Import an existing project**.
+3. Select your repo.
+4. Build settings are auto-detected from `netlify.toml`:
+   - **Build command:** `npm run build`
+   - **Publish directory:** `.next`
+5. Click **Deploy site**.
+
+### Environment variables on Netlify
+
+In the Netlify dashboard go to **Site configuration → Environment variables** and add:
+
+| Key | Example value |
+|-----|---------------|
+| `DATABASE_URL` | `postgresql://user:password@host:5432/dbname` |
+| `KAFKA_BROKER` | `localhost:9092` |
+| `ELASTICSEARCH_URL` | `http://localhost:9200` |
 
 ## Deploying to Docker
 
