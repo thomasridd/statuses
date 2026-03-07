@@ -1,14 +1,14 @@
 import { getStore } from '@netlify/blobs'
-import { defaultMotives, defaultStatuses } from './defaultData.js'
+import { defaultMotives, defaultStatuses } from './defaultData'
 
-function checkAuth(request) {
+function checkAuth(request: Request): boolean {
   const password = process.env.APP_PASSWORD
   if (!password) return true
   const auth = request.headers.get('x-app-password')
   return auth === password
 }
 
-export default async (request, context) => {
+export default async (request: Request) => {
   if (!checkAuth(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -31,7 +31,7 @@ export default async (request, context) => {
   }
 
   if (request.method === 'PUT') {
-    const body = await request.json()
+    const body = await request.json() as { motives?: unknown; statuses?: unknown }
 
     if (body.motives) {
       await store.setJSON('motives', body.motives)

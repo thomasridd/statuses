@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react'
+import type { Status } from '../types'
 
-export default function ValueModal({ status, onConfirm, onCancel }) {
-  const [value, setValue] = useState(status?.default_value ?? 0)
+interface ValueModalProps {
+  status: Status | null
+  onConfirm: (value: number) => void
+  onCancel: () => void
+}
+
+export default function ValueModal({ status, onConfirm, onCancel }: ValueModalProps) {
+  const [value, setValue] = useState<number | string>(status?.default_value ?? 0)
 
   useEffect(() => {
     setValue(status?.default_value ?? 0)

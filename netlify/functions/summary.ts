@@ -1,14 +1,15 @@
 import { getStore } from '@netlify/blobs'
-import { defaultMotives, defaultStatuses } from './defaultData.js'
+import { defaultMotives, defaultStatuses } from './defaultData'
+import type { LogEntry, Motive, Status } from '../../src/types'
 
-function checkAuth(request) {
+function checkAuth(request: Request): boolean {
   const password = process.env.APP_PASSWORD
   if (!password) return true
   const auth = request.headers.get('x-app-password')
   return auth === password
 }
 
-function getWeekBounds(dateStr) {
+function getWeekBounds(dateStr?: string | null): { start: Date; end: Date } {
   const date = dateStr ? new Date(dateStr) : new Date()
   const day = date.getDay() // 0=Sun
   const monday = new Date(date)
@@ -20,7 +21,7 @@ function getWeekBounds(dateStr) {
   return { start: monday, end: sunday }
 }
 
-export default async (request, context) => {
+export default async (request: Request) => {
   if (!checkAuth(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -34,23 +35,23 @@ export default async (request, context) => {
   const todayDate = url.searchParams.get('today') // YYYY-MM-DD
 
   const [motives, statuses, allLogs] = await Promise.all([
-    store.get('motives', { type: 'json' }).then(m => m || defaultMotives),
-    store.get('statuses', { type: 'json' }).then(s => s || defaultStatuses),
-    store.get('logs', { type: 'json' }).then(l => l || []),
+    store.get('motives', { type: 'json' }).then((m: Motive[] | null) => m || defaultMotives),
+    store.get('statuses', { type: 'json' }).then((s: Status[] | null) => s || defaultStatuses),
+    store.get('logs', { type: 'json' }).then((l: LogEntry[] | null) => l || []),
   ])
 
-  const statusMap = Object.fromEntries(statuses.map(s => [s.id, s]))
-  const motiveMap = Object.fromEntries(motives.map(m => [m.id, m]))
+  const statusMap = Object.fromEntries((statuses as Status[]).map((s: Status) => [s.id, s]))
+  const motiveMap = Object.fromEntries((motives as Motive[]).map((m: Motive) => [m.id, m]))
 
   // --- Today summary ---
   const todayStr = todayDate || new Date().toISOString().slice(0, 10)
-  const todayLogs = allLogs.filter(e => e.timestamp.startsWith(todayStr))
+  const todayLogs = (allLogs as LogEntry[]).filter((e: LogEntry) => e.timestamp.startsWith(todayStr))
 
-  const todayByMotive = {}
+  const todayByMotive: Record<string, { motive: Motive; entries: { entry: LogEntry; status: Status }[] }> = {}
   for (const entry of todayLogs) {
-    const status = statusMap[entry.status_id]
+    const status = statusMap[entry.status_id] as Status | undefined
     if (!status) continue
-    const motive = motiveMap[status.motive_id]
+    const motive = motiveMap[status.motive_id] as Motive | undefined
     if (!motive) continue
     if (!todayByMotive[motive.id]) {
       todayByMotive[motive.id] = { motive, entries: [] }
@@ -62,17 +63,17 @@ export default async (request, context) => {
 
   // --- Weekly totals ---
   const { start, end } = getWeekBounds(weekDate)
-  const weekLogs = allLogs.filter(e => {
+  const weekLogs = (allLogs as LogEntry[]).filter((e: LogEntry) => {
     const d = new Date(e.timestamp)
     return d >= start && d <= end
   })
 
   // Value status totals
-  const valueTotals = {}
-  const simpleCounts = {}
+  const valueTotals: Record<string, { status: Status; total: number }> = {}
+  const simpleCounts: Record<string, { status: Status; count: number }> = {}
 
   for (const entry of weekLogs) {
-    const status = statusMap[entry.status_id]
+    const status = statusMap[entry.status_id] as Status | undefined
     if (!status) continue
     if (status.type === 'value' && entry.value !== null) {
       if (!valueTotals[status.id]) {

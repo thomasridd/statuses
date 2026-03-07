@@ -1,4 +1,6 @@
-export const defaultMotives = [
+import type { Motive, Status } from '../../src/types'
+
+export const defaultMotives: Motive[] = [
   { id: 'domestic', name: 'Domestic Maintenance', order: 1 },
   { id: 'food', name: 'Food', order: 2 },
   { id: 'shopping', name: 'Shopping', order: 3 },
@@ -13,7 +15,7 @@ export const defaultMotives = [
   { id: 'outdoor', name: 'Outdoor / Errands', order: 12 },
 ]
 
-export const defaultStatuses = [
+export const defaultStatuses: Status[] = [
   // Domestic Maintenance - Kitchen
   { id: 'cleaned_kitchen', label: 'Cleaned kitchen', motive_id: 'domestic', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false },
   { id: 'washed_dishes', label: 'Washed dishes', motive_id: 'domestic', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false },
