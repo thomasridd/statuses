@@ -1,13 +1,14 @@
 import { getStore } from '@netlify/blobs'
+import type { LogEntry } from '../../src/types'
 
-function checkAuth(request) {
+function checkAuth(request: Request): boolean {
   const password = process.env.APP_PASSWORD
   if (!password) return true
   const auth = request.headers.get('x-app-password')
   return auth === password
 }
 
-export default async (request, context) => {
+export default async (request: Request) => {
   if (!checkAuth(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -22,7 +23,7 @@ export default async (request, context) => {
     })
   }
 
-  const body = await request.json()
+  const body = await request.json() as { status_id?: string; value?: number }
   const { status_id, value } = body
 
   if (!status_id) {
@@ -33,9 +34,9 @@ export default async (request, context) => {
   }
 
   const store = getStore('app-data')
-  const logs = await store.get('logs', { type: 'json' }) || []
+  const logs: LogEntry[] = await store.get('logs', { type: 'json' }) || []
 
-  const entry = {
+  const entry: LogEntry = {
     id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     status_id,
     timestamp: new Date().toISOString(),

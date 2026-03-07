@@ -1,19 +1,20 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../lib/api.js'
-import { formatTime, formatStatusLabel } from '../lib/format.js'
-import StatusCard from '../components/StatusCard.jsx'
-import ValueModal from '../components/ValueModal.jsx'
-import Toast from '../components/Toast.jsx'
-import NavBar from '../components/NavBar.jsx'
+import { api } from '../lib/api'
+import { formatTime, formatStatusLabel } from '../lib/format'
+import StatusCard from '../components/StatusCard'
+import ValueModal from '../components/ValueModal'
+import Toast from '../components/Toast'
+import NavBar from '../components/NavBar'
+import type { Status, LogEntry } from '../types'
 
 export default function Home() {
-  const [statuses, setStatuses] = useState([])
-  const [recentLogs, setRecentLogs] = useState([])
-  const [statusMap, setStatusMap] = useState({})
+  const [statuses, setStatuses] = useState<Status[]>([])
+  const [recentLogs, setRecentLogs] = useState<LogEntry[]>([])
+  const [statusMap, setStatusMap] = useState<Record<string, Status>>({})
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
-  const [customStatus, setCustomStatus] = useState(null)
+  const [customStatus, setCustomStatus] = useState<Status | null>(null)
   const [logging, setLogging] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -30,7 +31,7 @@ export default function Home() {
       setRecentLogs(logs)
 
       // Order: pinned first (by order), then most recently used (by last log timestamp)
-      const lastUsed = {}
+      const lastUsed: Record<string, string> = {}
       for (const log of [...logs].reverse()) {
         if (!lastUsed[log.status_id]) {
           lastUsed[log.status_id] = log.timestamp
@@ -60,7 +61,7 @@ export default function Home() {
     loadData()
   }, [loadData])
 
-  async function logStatus(status, value) {
+  async function logStatus(status: Status, value?: number) {
     setLogging(true)
     try {
       const logValue = value !== undefined ? value : (status.type === 'value' ? status.default_value : undefined)
@@ -70,21 +71,21 @@ export default function Home() {
       // Refresh recent logs
       const { logs } = await api.getLogs({ limit: 20 })
       setRecentLogs(logs)
-    } catch (err) {
+    } catch {
       setToast('Error logging status')
     } finally {
       setLogging(false)
     }
   }
 
-  function handleLogCustom(status) {
+  function handleLogCustom(status: Status) {
     setCustomStatus(status)
   }
 
-  async function handleCustomConfirm(value) {
+  async function handleCustomConfirm(value: number) {
     const status = customStatus
     setCustomStatus(null)
-    await logStatus(status, value)
+    if (status) await logStatus(status, value)
   }
 
   const filtered = search.trim()

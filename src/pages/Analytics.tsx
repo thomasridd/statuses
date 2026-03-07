@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react'
-import { api } from '../lib/api.js'
-import { formatTime, formatDate, formatStatusLabel } from '../lib/format.js'
-import NavBar from '../components/NavBar.jsx'
+import { api } from '../lib/api'
+import { formatTime, formatStatusLabel } from '../lib/format'
+import NavBar from '../components/NavBar'
+import type { SummaryResponse } from '../types'
 
-function WeekNav({ weekDate, onChange }) {
-  function shift(days) {
+interface WeekNavProps {
+  weekDate: string
+  onChange: (date: string) => void
+}
+
+function WeekNav({ weekDate, onChange }: WeekNavProps) {
+  function shift(days: number) {
     const d = new Date(weekDate)
     d.setDate(d.getDate() + days)
     onChange(d.toISOString().slice(0, 10))
@@ -33,7 +39,7 @@ function WeekNav({ weekDate, onChange }) {
 }
 
 export default function Analytics() {
-  const [summary, setSummary] = useState(null)
+  const [summary, setSummary] = useState<SummaryResponse | null>(null)
   const [weekDate, setWeekDate] = useState(new Date().toISOString().slice(0, 10))
   const [loading, setLoading] = useState(true)
 

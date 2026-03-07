@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { api } from '../lib/api.js'
-import NavBar from '../components/NavBar.jsx'
-import Toast from '../components/Toast.jsx'
+import { api } from '../lib/api'
+import NavBar from '../components/NavBar'
+import Toast from '../components/Toast'
+import type { Motive, Status } from '../types'
 
 export default function Library() {
-  const [motives, setMotives] = useState([])
-  const [statuses, setStatuses] = useState([])
-  const [selectedMotive, setSelectedMotive] = useState(null)
+  const [motives, setMotives] = useState<Motive[]>([])
+  const [statuses, setStatuses] = useState<Status[]>([])
+  const [selectedMotive, setSelectedMotive] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
@@ -20,7 +21,7 @@ export default function Library() {
     })
   }, [])
 
-  async function saveStatuses(updated) {
+  async function saveStatuses(updated: Status[]) {
     setSaving(true)
     try {
       await api.updateStatuses({ statuses: updated })
@@ -33,21 +34,21 @@ export default function Library() {
     }
   }
 
-  function toggleEnabled(statusId) {
+  function toggleEnabled(statusId: string) {
     const updated = statuses.map(s =>
       s.id === statusId ? { ...s, enabled: !s.enabled } : s
     )
     saveStatuses(updated)
   }
 
-  function togglePinned(statusId) {
+  function togglePinned(statusId: string) {
     const updated = statuses.map(s =>
       s.id === statusId ? { ...s, pinned: !s.pinned } : s
     )
     saveStatuses(updated)
   }
 
-  function moveStatus(statusId, direction) {
+  function moveStatus(statusId: string, direction: 'up' | 'down') {
     const motiveStatuses = statuses
       .filter(s => s.motive_id === selectedMotive)
       .sort((a, b) => a.order - b.order)

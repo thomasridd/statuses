@@ -1,4 +1,13 @@
-export default function StatusCard({ status, onLog, onLogCustom, disabled }) {
+import type { Status } from '../types'
+
+interface StatusCardProps {
+  status: Status
+  onLog: (status: Status) => void
+  onLogCustom: (status: Status) => void
+  disabled?: boolean
+}
+
+export default function StatusCard({ status, onLog, onLogCustom, disabled }: StatusCardProps) {
   const isValue = status.type === 'value'
   const label = isValue
     ? `${status.label} ${status.default_value}${status.unit}`

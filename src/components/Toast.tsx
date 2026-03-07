@@ -1,6 +1,11 @@
 import { useEffect } from 'react'
 
-export default function Toast({ message, onDismiss }) {
+interface ToastProps {
+  message: string
+  onDismiss: () => void
+}
+
+export default function Toast({ message, onDismiss }: ToastProps) {
   useEffect(() => {
     if (!message) return
     const t = setTimeout(onDismiss, 2500)

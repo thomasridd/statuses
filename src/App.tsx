@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { api, AuthError } from './lib/api.js'
-import LoginGate from './components/LoginGate.jsx'
-import Home from './pages/Home.jsx'
-import Analytics from './pages/Analytics.jsx'
-import Library from './pages/Library.jsx'
+import { api, AuthError } from './lib/api'
+import LoginGate from './components/LoginGate'
+import Home from './pages/Home'
+import Analytics from './pages/Analytics'
+import Library from './pages/Library'
 
-// authState: 'checking' | 'authed' | 'login'
+type AuthState = 'checking' | 'authed' | 'login'
+
 export default function App() {
-  const [authState, setAuthState] = useState('checking')
+  const [authState, setAuthState] = useState<AuthState>('checking')
 
   useEffect(() => {
     api.getStatuses()
@@ -24,7 +25,7 @@ export default function App() {
       })
   }, [])
 
-  function handleLogin(password) {
+  function handleLogin(password: string) {
     sessionStorage.setItem('app_password', password)
     setAuthState('authed')
   }
