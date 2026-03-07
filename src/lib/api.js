@@ -4,6 +4,13 @@ function getPassword() {
   return sessionStorage.getItem('app_password') || ''
 }
 
+export class AuthError extends Error {
+  constructor() {
+    super('Unauthorized')
+    this.status = 401
+  }
+}
+
 async function apiFetch(path, options = {}) {
   const password = getPassword()
   const headers = {
@@ -13,8 +20,7 @@ async function apiFetch(path, options = {}) {
   }
   const res = await fetch(`${BASE}${path}`, { ...options, headers })
   if (res.status === 401) {
-    sessionStorage.removeItem('app_password')
-    window.location.reload()
+    throw new AuthError()
   }
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }))

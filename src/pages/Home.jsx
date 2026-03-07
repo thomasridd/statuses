@@ -18,39 +18,42 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
 
   const loadData = useCallback(async () => {
-    const [{ statuses: allStatuses }, { logs }] = await Promise.all([
-      api.getStatuses(),
-      api.getLogs({ limit: 20 }),
-    ])
+    try {
+      const [{ statuses: allStatuses }, { logs }] = await Promise.all([
+        api.getStatuses(),
+        api.getLogs({ limit: 20 }),
+      ])
 
-    const enabled = allStatuses.filter(s => s.enabled)
-    const map = Object.fromEntries(allStatuses.map(s => [s.id, s]))
-    setStatusMap(map)
-    setRecentLogs(logs)
+      const enabled = allStatuses.filter(s => s.enabled)
+      const map = Object.fromEntries(allStatuses.map(s => [s.id, s]))
+      setStatusMap(map)
+      setRecentLogs(logs)
 
-    // Order: pinned first (by order), then most recently used (by last log timestamp)
-    const lastUsed = {}
-    for (const log of [...logs].reverse()) {
-      if (!lastUsed[log.status_id]) {
-        lastUsed[log.status_id] = log.timestamp
+      // Order: pinned first (by order), then most recently used (by last log timestamp)
+      const lastUsed = {}
+      for (const log of [...logs].reverse()) {
+        if (!lastUsed[log.status_id]) {
+          lastUsed[log.status_id] = log.timestamp
+        }
       }
+
+      const sorted = [...enabled].sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1
+        if (!a.pinned && b.pinned) return 1
+        if (a.pinned && b.pinned) return a.order - b.order
+        // Both unpinned: sort by most recently used
+        const aLast = lastUsed[a.id] || ''
+        const bLast = lastUsed[b.id] || ''
+        if (aLast && bLast) return bLast.localeCompare(aLast)
+        if (aLast) return -1
+        if (bLast) return 1
+        return a.order - b.order
+      })
+
+      setStatuses(sorted)
+    } finally {
+      setLoading(false)
     }
-
-    const sorted = [...enabled].sort((a, b) => {
-      if (a.pinned && !b.pinned) return -1
-      if (!a.pinned && b.pinned) return 1
-      if (a.pinned && b.pinned) return a.order - b.order
-      // Both unpinned: sort by most recently used
-      const aLast = lastUsed[a.id] || ''
-      const bLast = lastUsed[b.id] || ''
-      if (aLast && bLast) return bLast.localeCompare(aLast)
-      if (aLast) return -1
-      if (bLast) return 1
-      return a.order - b.order
-    })
-
-    setStatuses(sorted)
-    setLoading(false)
   }, [])
 
   useEffect(() => {
