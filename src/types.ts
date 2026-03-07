@@ -51,9 +51,29 @@ export interface SummaryResponse {
   weekSimpleCounts: SimpleCount[]
 }
 
+export interface ContextMembership {
+  status_id: string
+  order: number
+}
+
+export interface Context {
+  id: string
+  name: string
+  order: number
+  statuses: ContextMembership[]
+}
+
 export interface StatusesResponse {
   motives: Motive[]
   statuses: Status[]
+}
+
+export interface ContextsResponse {
+  contexts: Context[]
+}
+
+export interface UpdateContextsResponse {
+  ok: boolean
 }
 
 export interface LogsResponse {

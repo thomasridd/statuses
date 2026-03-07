@@ -1,4 +1,4 @@
-import type { Motive, Status } from '../../src/types'
+import type { Motive, Status, Context } from '../../src/types'
 
 export const defaultMotives: Motive[] = [
   { id: 'domestic', name: 'Domestic Maintenance', order: 1 },
@@ -141,4 +141,68 @@ export const defaultStatuses: Status[] = [
   { id: 'walked_outside', label: 'Walked outside', motive_id: 'outdoor', type: 'value', unit: 'mins', default_value: 20, enabled: true, order: 3, pinned: false },
   { id: 'errands_run', label: 'Errands run', motive_id: 'outdoor', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false },
   { id: 'park_visit', label: 'Park visit', motive_id: 'outdoor', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false },
+]
+
+export const defaultContexts: Context[] = [
+  {
+    id: 'morning_routine',
+    name: 'Morning routine',
+    order: 1,
+    statuses: [
+      { status_id: 'woke_up', order: 1 },
+      { status_id: 'showered', order: 2 },
+      { status_id: 'brushed_teeth', order: 3 },
+      { status_id: 'skincare', order: 4 },
+      { status_id: 'weight', order: 5 },
+      { status_id: 'ate_breakfast', order: 6 },
+      { status_id: 'coffee', order: 7 },
+      { status_id: 'tea', order: 8 },
+    ],
+  },
+  {
+    id: 'in_the_kitchen',
+    name: 'In the kitchen',
+    order: 2,
+    statuses: [
+      { status_id: 'cooked_breakfast', order: 1 },
+      { status_id: 'cooked_lunch', order: 2 },
+      { status_id: 'cooked_dinner', order: 3 },
+      { status_id: 'washed_dishes', order: 4 },
+      { status_id: 'loaded_dishwasher', order: 5 },
+      { status_id: 'unloaded_dishwasher', order: 6 },
+      { status_id: 'wiped_surfaces', order: 7 },
+      { status_id: 'cleaned_kitchen', order: 8 },
+    ],
+  },
+  {
+    id: 'domestic_grind',
+    name: 'Domestic grind',
+    order: 3,
+    statuses: [
+      { status_id: 'vacuumed', order: 1 },
+      { status_id: 'mopped_floor', order: 2 },
+      { status_id: 'dusted', order: 3 },
+      { status_id: 'cleaned_bathroom', order: 4 },
+      { status_id: 'cleaned_toilet', order: 5 },
+      { status_id: 'cleaned_shower', order: 6 },
+      { status_id: 'started_laundry', order: 7 },
+      { status_id: 'hung_laundry', order: 8 },
+      { status_id: 'folded_laundry', order: 9 },
+      { status_id: 'put_laundry_away', order: 10 },
+      { status_id: 'changed_bedding', order: 11 },
+      { status_id: 'took_bins_out', order: 12 },
+    ],
+  },
+  {
+    id: 'evening_wind_down',
+    name: 'Evening wind-down',
+    order: 4,
+    statuses: [
+      { status_id: 'ate_dinner', order: 1 },
+      { status_id: 'brushed_teeth', order: 2 },
+      { status_id: 'skincare', order: 3 },
+      { status_id: 'went_to_bed', order: 4 },
+      { status_id: 'sleep', order: 5 },
+    ],
+  },
 ]
