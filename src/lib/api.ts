@@ -4,6 +4,8 @@ import type {
   PostLogResponse,
   UpdateStatusesResponse,
   SummaryResponse,
+  ContextsResponse,
+  UpdateContextsResponse,
 } from '../types'
 
 const BASE = '/api'
@@ -55,4 +57,7 @@ export const api = {
     const q = new URLSearchParams(params).toString()
     return apiFetch<SummaryResponse>(`/summary${q ? '?' + q : ''}`)
   },
+  getContexts: () => apiFetch<ContextsResponse>('/contexts'),
+  updateContexts: (data: { contexts: unknown }) =>
+    apiFetch<UpdateContextsResponse>('/contexts', { method: 'PUT', body: JSON.stringify(data) }),
 }
