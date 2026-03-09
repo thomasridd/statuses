@@ -19,6 +19,7 @@ export default function Library() {
   const [newContextName, setNewContextName] = useState('')
   const [addStatusSearch, setAddStatusSearch] = useState('')
   const [showAddStatus, setShowAddStatus] = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   useEffect(() => {
     Promise.all([api.getStatuses(), api.getContexts()]).then(
@@ -32,6 +33,25 @@ export default function Library() {
       }
     )
   }, [])
+
+  async function resetToDefaults() {
+    setSaving(true)
+    try {
+      await api.resetToDefaults()
+      const [{ motives: m, statuses: s }, { contexts: c }] = await Promise.all([api.getStatuses(), api.getContexts()])
+      setMotives(m.sort((a, b) => a.order - b.order))
+      setStatuses(s)
+      setSelectedMotive(m[0]?.id || null)
+      setContexts(c.sort((a, b) => a.order - b.order))
+      setSelectedContext(c[0]?.id || null)
+      setToast('Reset to defaults')
+    } catch {
+      setToast('Error resetting')
+    } finally {
+      setSaving(false)
+      setShowResetConfirm(false)
+    }
+  }
 
   // --- Statuses tab actions ---
 
@@ -206,6 +226,13 @@ export default function Library() {
                 Contexts
               </button>
             </div>
+            <button
+              onClick={() => setShowResetConfirm(true)}
+              disabled={saving}
+              className="ml-auto px-3 py-1.5 text-xs font-medium bg-white border border-red-200 rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40"
+            >
+              Reset
+            </button>
           </div>
 
           {tab === 'statuses' && (
@@ -454,6 +481,33 @@ export default function Library() {
           </>
         )}
       </main>
+
+      {showResetConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-bold text-gray-900 mb-2">Reset to defaults?</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              This will replace all statuses, motives, and contexts with the built-in defaults. Your log history will not be affected.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                disabled={saving}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-40"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={resetToDefaults}
+                disabled={saving}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-40"
+              >
+                {saving ? 'Resetting…' : 'Reset'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Toast message={toast} onDismiss={() => setToast('')} />
       <NavBar />
