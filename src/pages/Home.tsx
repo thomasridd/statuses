@@ -15,7 +15,7 @@ export default function Home() {
   const [statusMap, setStatusMap] = useState<Record<string, Status>>({})
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
-  const [customStatus, setCustomStatus] = useState<Status | null>(null)
+  const [customEntry, setCustomEntry] = useState<{ status: Status; logged_by: 'me' | 'team' } | null>(null)
   const [logging, setLogging] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -42,13 +42,14 @@ export default function Home() {
     loadData()
   }, [loadData])
 
-  async function logStatus(status: Status, value?: number) {
+  async function logStatus(status: Status, logged_by: 'me' | 'team', value?: number) {
     setLogging(true)
     try {
-      const logValue = value !== undefined ? value : (status.type === 'value' ? status.default_value : undefined)
-      await api.postLog(status.id, logValue)
-      const label = formatStatusLabel(status, logValue)
-      setToast(`Logged: ${label}`)
+      const logValue = value !== undefined ? value : (status.type === 'value' ? status.default_value ?? undefined : undefined)
+      await api.postLog(status.id, logged_by, logValue)
+      const label = formatStatusLabel(status, logValue ?? null)
+      const who = logged_by === 'team' ? 'team' : 'me'
+      setToast(`Logged for ${who}: ${label}`)
       const { logs } = await api.getLogs({ limit: 20 })
       setRecentLogs(logs)
     } catch {
@@ -58,14 +59,14 @@ export default function Home() {
     }
   }
 
-  function handleLogCustom(status: Status) {
-    setCustomStatus(status)
+  function handleLogCustom(status: Status, logged_by: 'me' | 'team') {
+    setCustomEntry({ status, logged_by })
   }
 
   async function handleCustomConfirm(value: number) {
-    const status = customStatus
-    setCustomStatus(null)
-    if (status) await logStatus(status, value)
+    const entry = customEntry
+    setCustomEntry(null)
+    if (entry) await logStatus(entry.status, entry.logged_by, value)
   }
 
   const enabledStatusIds = new Set(statuses.map(s => s.id))
@@ -120,7 +121,7 @@ export default function Home() {
             {filtered.length === 0 ? (
               <p className="text-center text-gray-400 text-sm py-8">No statuses found</p>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-2">
                 {filtered.map(status => (
                   <StatusCard
                     key={status.id}
@@ -141,7 +142,7 @@ export default function Home() {
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   {context.name}
                 </h2>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-2">
                   {ctxStatuses.map(status => (
                     <StatusCard
                       key={status.id}
@@ -160,7 +161,7 @@ export default function Home() {
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   Other
                 </h2>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-2">
                   {ungroupedStatuses.map(status => (
                     <StatusCard
                       key={status.id}
@@ -193,8 +194,11 @@ export default function Home() {
                         <span className="text-xs text-gray-400 w-12 shrink-0 font-mono">
                           {formatTime(entry.timestamp)}
                         </span>
-                        <span className="text-sm text-gray-800">
+                        <span className="text-sm text-gray-800 flex-1">
                           {formatStatusLabel(status, entry.value)}
+                        </span>
+                        <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${entry.logged_by === 'team' ? 'bg-violet-100 text-violet-700' : 'bg-sky-100 text-sky-700'}`}>
+                          {entry.logged_by === 'team' ? 'team' : 'me'}
                         </span>
                       </div>
                     )
@@ -208,9 +212,9 @@ export default function Home() {
 
       <Toast message={toast} onDismiss={() => setToast('')} />
       <ValueModal
-        status={customStatus}
+        status={customEntry?.status ?? null}
         onConfirm={handleCustomConfirm}
-        onCancel={() => setCustomStatus(null)}
+        onCancel={() => setCustomEntry(null)}
       />
       <NavBar />
     </div>

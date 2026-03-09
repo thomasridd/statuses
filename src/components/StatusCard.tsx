@@ -2,8 +2,8 @@ import type { Status } from '../types'
 
 interface StatusCardProps {
   status: Status
-  onLog: (status: Status) => void
-  onLogCustom: (status: Status) => void
+  onLog: (status: Status, logged_by: 'me' | 'team') => void
+  onLogCustom: (status: Status, logged_by: 'me' | 'team') => void
   disabled?: boolean
 }
 
@@ -14,24 +14,24 @@ export default function StatusCard({ status, onLog, onLogCustom, disabled }: Sta
     : status.label
 
   return (
-    <div className="flex rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+    <div className="flex items-center rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+      <span className="flex-1 px-3 py-2.5 text-sm font-medium text-gray-800 leading-snug min-w-0 truncate">
+        {label}
+      </span>
       <button
-        className="flex-1 px-3 py-3 text-left text-sm font-medium text-gray-800 leading-snug active:bg-gray-50 disabled:opacity-50"
-        onClick={() => onLog(status)}
+        className="shrink-0 px-3 py-2.5 text-xs font-medium text-sky-700 bg-sky-50 hover:bg-sky-100 active:bg-sky-200 disabled:opacity-50 border-l border-gray-100"
+        onClick={() => isValue ? onLogCustom(status, 'me') : onLog(status, 'me')}
         disabled={disabled}
       >
-        {label}
+        Me
       </button>
-      {isValue && (
-        <button
-          className="px-3 border-l border-gray-200 text-gray-400 hover:text-gray-700 active:bg-gray-50 text-lg disabled:opacity-50"
-          onClick={() => onLogCustom(status)}
-          disabled={disabled}
-          title="Log custom value"
-        >
-          ✎
-        </button>
-      )}
+      <button
+        className="shrink-0 px-3 py-2.5 text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 active:bg-violet-200 disabled:opacity-50 border-l border-gray-100"
+        onClick={() => isValue ? onLogCustom(status, 'team') : onLog(status, 'team')}
+        disabled={disabled}
+      >
+        Team
+      </button>
     </div>
   )
 }
