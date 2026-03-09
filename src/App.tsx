@@ -5,6 +5,7 @@ import LoginGate from './components/LoginGate'
 import Home from './pages/Home'
 import Analytics from './pages/Analytics'
 import Library from './pages/Library'
+import Goals from './pages/Goals'
 
 type AuthState = 'checking' | 'authed' | 'login'
 
@@ -46,6 +47,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/goals" element={<Goals />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/library" element={<Library />} />
         <Route path="*" element={<Navigate to="/" replace />} />

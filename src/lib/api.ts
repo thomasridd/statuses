@@ -6,6 +6,8 @@ import type {
   SummaryResponse,
   ContextsResponse,
   UpdateContextsResponse,
+  GoldStarsResponse,
+  UpdateGoldStarsResponse,
 } from '../types'
 
 const BASE = '/api'
@@ -61,4 +63,7 @@ export const api = {
   updateContexts: (data: { contexts: unknown }) =>
     apiFetch<UpdateContextsResponse>('/contexts', { method: 'PUT', body: JSON.stringify(data) }),
   resetToDefaults: () => apiFetch<{ ok: boolean }>('/reset', { method: 'POST' }),
+  getGoldStars: () => apiFetch<GoldStarsResponse>('/gold-stars'),
+  updateGoldStars: (data: { goldStars: unknown }) =>
+    apiFetch<UpdateGoldStarsResponse>('/gold-stars', { method: 'PUT', body: JSON.stringify(data) }),
 }
