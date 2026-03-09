@@ -31,7 +31,7 @@ export default function GoldStarModal({ goldStar, onSave, onCancel }: GoldStarMo
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center sm:items-center">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md shadow-xl">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md shadow-xl mb-[4.5rem] sm:mb-0">
         <div className="px-5 pt-5 pb-2 border-b border-gray-100">
           <h2 className="text-base font-semibold text-gray-900">
             {isEdit ? 'Edit goal' : 'New goal'} ⭐
