@@ -60,4 +60,5 @@ export const api = {
   getContexts: () => apiFetch<ContextsResponse>('/contexts'),
   updateContexts: (data: { contexts: unknown }) =>
     apiFetch<UpdateContextsResponse>('/contexts', { method: 'PUT', body: JSON.stringify(data) }),
+  resetToDefaults: () => apiFetch<{ ok: boolean }>('/reset', { method: 'POST' }),
 }
