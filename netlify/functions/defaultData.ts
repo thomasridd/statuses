@@ -5,7 +5,6 @@ export const defaultMotives: Motive[] = [
   { id: 'domestic_grind', name: 'Domestic grind', order: 2 },
   { id: 'family', name: 'Family', order: 3 },
   { id: 'bathroom', name: 'Bathroom', order: 4 },
-  { id: 'gold_stars', name: 'Gold stars', order: 5 },
 ]
 
 export const defaultStatuses: Status[] = [
@@ -41,11 +40,6 @@ export const defaultStatuses: Status[] = [
   { id: 'teeth', label: 'Teeth 🦷', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false },
   { id: 'wash', label: 'Wash 🛀', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false },
 
-  // Gold stars
-  { id: 'tidy_a_drawer', label: 'Tidy a drawer ✨', motive_id: 'gold_stars', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false },
-  { id: 'prep_an_outbox', label: 'Prep an outbox ⭐', motive_id: 'gold_stars', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false },
-  { id: 'empty_outbox', label: 'Empty outbox 🌟', motive_id: 'gold_stars', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false },
-  { id: 'sort_your_life_out', label: 'Sort your life out 💫', motive_id: 'gold_stars', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false },
 ]
 
 export const defaultContexts: Context[] = [
@@ -99,17 +93,6 @@ export const defaultContexts: Context[] = [
     statuses: [
       { status_id: 'teeth', order: 1 },
       { status_id: 'wash', order: 2 },
-    ],
-  },
-  {
-    id: 'gold_stars',
-    name: 'Gold stars',
-    order: 5,
-    statuses: [
-      { status_id: 'tidy_a_drawer', order: 1 },
-      { status_id: 'prep_an_outbox', order: 2 },
-      { status_id: 'empty_outbox', order: 3 },
-      { status_id: 'sort_your_life_out', order: 4 },
     ],
   },
 ]

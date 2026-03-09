@@ -89,3 +89,20 @@ export interface PostLogResponse {
 export interface UpdateStatusesResponse {
   ok: boolean
 }
+
+export interface GoldStar {
+  id: string
+  caption: string
+  notes: string
+  created_at: string
+  completed_at?: string
+  order: number
+}
+
+export interface GoldStarsResponse {
+  goldStars: GoldStar[]
+}
+
+export interface UpdateGoldStarsResponse {
+  ok: boolean
+}
