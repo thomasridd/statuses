@@ -8,10 +8,39 @@ import Toast from '../components/Toast'
 import NavBar from '../components/NavBar'
 import type { Status, LogEntry, Context } from '../types'
 
+interface StatusTodayStats {
+  count: number
+  lastAt: string
+}
+
+function getTodayStart(): Date {
+  const now = new Date()
+  const cutoff = new Date(now)
+  cutoff.setHours(4, 30, 0, 0)
+  if (now < cutoff) {
+    cutoff.setDate(cutoff.getDate() - 1)
+  }
+  return cutoff
+}
+
+function computeTodayStats(logs: LogEntry[]): Record<string, StatusTodayStats> {
+  const stats: Record<string, StatusTodayStats> = {}
+  // logs are sorted newest first
+  for (const entry of logs) {
+    if (!stats[entry.status_id]) {
+      stats[entry.status_id] = { count: 1, lastAt: entry.timestamp }
+    } else {
+      stats[entry.status_id].count++
+    }
+  }
+  return stats
+}
+
 export default function Home() {
   const [statuses, setStatuses] = useState<Status[]>([])
   const [contexts, setContexts] = useState<Context[]>([])
   const [recentLogs, setRecentLogs] = useState<LogEntry[]>([])
+  const [todayStats, setTodayStats] = useState<Record<string, StatusTodayStats>>({})
   const [statusMap, setStatusMap] = useState<Record<string, Status>>({})
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
@@ -21,16 +50,19 @@ export default function Home() {
 
   const loadData = useCallback(async () => {
     try {
-      const [{ statuses: allStatuses }, { logs }, { contexts: allContexts }] = await Promise.all([
+      const todayStart = getTodayStart()
+      const [{ statuses: allStatuses }, { logs }, { contexts: allContexts }, { logs: todayLogs }] = await Promise.all([
         api.getStatuses(),
         api.getLogs({ limit: 20 }),
         api.getContexts(),
+        api.getLogs({ since: todayStart.toISOString() }),
       ])
 
       const enabled = allStatuses.filter(s => s.enabled && s.status_category !== 'badge')
       const map = Object.fromEntries(allStatuses.map(s => [s.id, s]))
       setStatusMap(map)
       setRecentLogs(logs)
+      setTodayStats(computeTodayStats(todayLogs))
       setContexts(allContexts.sort((a, b) => a.order - b.order))
       setStatuses(enabled)
     } finally {
@@ -50,8 +82,13 @@ export default function Home() {
       const label = formatStatusLabel(status, logValue ?? null)
       const who = logged_by === 'team' ? 'team' : 'me'
       setToast(`Logged for ${who}: ${label}`)
-      const { logs } = await api.getLogs({ limit: 20 })
+      const todayStart = getTodayStart()
+      const [{ logs }, { logs: todayLogs }] = await Promise.all([
+        api.getLogs({ limit: 20 }),
+        api.getLogs({ since: todayStart.toISOString() }),
+      ])
       setRecentLogs(logs)
+      setTodayStats(computeTodayStats(todayLogs))
     } catch {
       setToast('Error logging status')
     } finally {
@@ -129,6 +166,7 @@ export default function Home() {
                     onLog={logStatus}
                     onLogCustom={handleLogCustom}
                     disabled={logging}
+                    todayStats={todayStats[status.id]}
                   />
                 ))}
               </div>
@@ -150,6 +188,7 @@ export default function Home() {
                       onLog={logStatus}
                       onLogCustom={handleLogCustom}
                       disabled={logging}
+                      todayStats={todayStats[status.id]}
                     />
                   ))}
                 </div>
@@ -169,6 +208,7 @@ export default function Home() {
                       onLog={logStatus}
                       onLogCustom={handleLogCustom}
                       disabled={logging}
+                      todayStats={todayStats[status.id]}
                     />
                   ))}
                 </div>
