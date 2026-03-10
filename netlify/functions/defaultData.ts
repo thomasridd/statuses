@@ -17,7 +17,6 @@ export const defaultStatuses: Status[] = [
   { id: 'dishwasher_unloaded', label: 'Dishwasher unloaded 🍽️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'task' },
   { id: 'surfaces_cleaned', label: 'Surfaces cleaned 🧽', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
   { id: 'bins', label: 'Bins 🗑️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'task' },
-  { id: 'eat_out', label: 'Eat out 🍛', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'task' },
 
   // Domestic grind
   { id: 'laundry_loaded', label: 'Laundry loaded 🧺', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
@@ -64,7 +63,6 @@ export const defaultContexts: Context[] = [
       { status_id: 'dishwasher_unloaded', order: 5 },
       { status_id: 'surfaces_cleaned', order: 6 },
       { status_id: 'bins', order: 7 },
-      { status_id: 'eat_out', order: 8 },
     ],
   },
   {
