@@ -5,40 +5,49 @@ export const defaultMotives: Motive[] = [
   { id: 'domestic_grind', name: 'Domestic grind', order: 2 },
   { id: 'family', name: 'Family', order: 3 },
   { id: 'bathroom', name: 'Bathroom', order: 4 },
+  { id: 'badges', name: 'Badges', order: 5 },
 ]
 
 export const defaultStatuses: Status[] = [
   // Kitchen
-  { id: 'cooked_a_meal', label: 'Cooked a meal 🧑‍🍳', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false },
-  { id: 'meal_planned', label: 'Meal Planned 📝', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false },
-  { id: 'tidy_the_kitchen', label: 'Tidy the kitchen 🚰', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false },
-  { id: 'dishwasher_loaded', label: 'Dishwasher loaded 💦', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false },
-  { id: 'dishwasher_unloaded', label: 'Dishwasher unloaded 🍽️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false },
-  { id: 'surfaces_cleaned', label: 'Surfaces cleaned 🧽', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false },
-  { id: 'bins', label: 'Bins 🗑️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false },
-  { id: 'eat_out', label: 'Eat out 🍛', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false },
+  { id: 'cooked_a_meal', label: 'Cooked a meal 🧑‍🍳', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
+  { id: 'meal_planned', label: 'Meal Planned 📝', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
+  { id: 'tidy_the_kitchen', label: 'Tidy the kitchen 🚰', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
+  { id: 'dishwasher_loaded', label: 'Dishwasher loaded 💦', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'task' },
+  { id: 'dishwasher_unloaded', label: 'Dishwasher unloaded 🍽️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'task' },
+  { id: 'surfaces_cleaned', label: 'Surfaces cleaned 🧽', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
+  { id: 'bins', label: 'Bins 🗑️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'task' },
+  { id: 'eat_out', label: 'Eat out 🍛', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'task' },
 
   // Domestic grind
-  { id: 'laundry_loaded', label: 'Laundry loaded 🧺', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false },
-  { id: 'laundry_cranked', label: 'Laundry cranked ⚙️', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false },
-  { id: 'laundry_put_away', label: 'Laundry put away 🧦', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false },
-  { id: 'tidied_to_zero', label: 'Tidied to zero 🧹', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false },
-  { id: 'kelvin_run', label: 'Kelvin run 🤖', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false },
+  { id: 'laundry_loaded', label: 'Laundry loaded 🧺', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
+  { id: 'laundry_cranked', label: 'Laundry cranked ⚙️', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
+  { id: 'laundry_put_away', label: 'Laundry put away 🧦', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
+  { id: 'tidied_to_zero', label: 'Tidied to zero 🧹', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'task' },
+  { id: 'kelvin_run', label: 'Kelvin run 🤖', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'task' },
 
   // Family
-  { id: 'supervised_homework', label: 'Supervised homework 📚', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false },
-  { id: 'oversaw_piano_practice', label: 'Oversaw piano practice 🎹', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false },
-  { id: 'drank_coffee', label: 'Drank Coffee ☕️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false },
-  { id: 'drank_tea', label: 'Drank Tea 🫖', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false },
-  { id: 'kid_bath', label: 'Kid bath 🛁', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false },
-  { id: 'kid_bedtime', label: 'Kid bedtime 🛏️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false },
-  { id: 'online_grocery_shop', label: 'Online grocery shop 📱', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false },
-  { id: 'top_up_shop', label: 'Top up shop 🛒', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false },
-  { id: 'put_the_house_to_bed', label: 'Put the house to bed 🌙', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 9, pinned: false },
+  { id: 'supervised_homework', label: 'Supervised homework 📚', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
+  { id: 'oversaw_piano_practice', label: 'Oversaw piano practice 🎹', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
+  { id: 'drank_coffee', label: 'Drank Coffee ☕️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
+  { id: 'drank_tea', label: 'Drank Tea 🫖', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'task' },
+  { id: 'kid_bath', label: 'Kid bath 🛁', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'task' },
+  { id: 'kid_bedtime', label: 'Kid bedtime 🛏️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
+  { id: 'online_grocery_shop', label: 'Online grocery shop 📱', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'task' },
+  { id: 'top_up_shop', label: 'Top up shop 🛒', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'task' },
+  { id: 'put_the_house_to_bed', label: 'Put the house to bed 🌙', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 9, pinned: false, status_category: 'task' },
 
   // Bathroom
-  { id: 'teeth', label: 'Teeth 🦷', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false },
-  { id: 'wash', label: 'Wash 🛀', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false },
+  { id: 'teeth', label: 'Teeth 🦷', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
+  { id: 'wash', label: 'Wash 🛀', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
+
+  // Badges
+  { id: 'badge_up_and_out', label: 'Up and out ⏰', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'badge', criteria: 'Out of the house before 8.20', valence: 'positive' },
+  { id: 'badge_robo_ready', label: 'Robo-ready 🤖', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'badge', criteria: 'Starting Kelvin on the up and out', valence: 'positive' },
+  { id: 'badge_home_cooked', label: 'Home cooked 🥗', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'badge', criteria: '3 healthy home cooked meals', valence: 'positive' },
+  { id: 'badge_big_napper', label: 'Big napper 👩‍🍼', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'badge', criteria: 'Nap off at least 2 hours', valence: 'negative' },
+  { id: 'badge_good_lad', label: 'Good lad ⭐', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'badge', criteria: 'Attitude star', valence: 'positive' },
+  { id: 'badge_golden_bedtime', label: 'Golden bedtime 🛌', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'badge', criteria: 'Down by 8.35', valence: 'positive' },
 
 ]
 

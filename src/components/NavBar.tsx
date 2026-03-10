@@ -5,6 +5,7 @@ export default function NavBar() {
 
   const links = [
     { to: '/', label: 'Log', icon: '📋' },
+    { to: '/badges', label: 'Badges', icon: '🏅' },
     { to: '/goals', label: 'Goals', icon: '⭐' },
     { to: '/analytics', label: 'Stats', icon: '📊' },
     { to: '/library', label: 'Library', icon: '⚙️' },
