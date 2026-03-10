@@ -19,18 +19,22 @@ export default async (request: Request) => {
   const store = getStore('app-data')
   const url = new URL(request.url)
   const date = url.searchParams.get('date') // YYYY-MM-DD
+  const since = url.searchParams.get('since') // ISO timestamp
   const limit = parseInt(url.searchParams.get('limit') || '50')
 
   let logs: LogEntry[] = await store.get('logs', { type: 'json' }) || []
 
   if (date) {
     logs = logs.filter(entry => entry.timestamp.startsWith(date))
+  } else if (since) {
+    const sinceTime = new Date(since).getTime()
+    logs = logs.filter(entry => new Date(entry.timestamp).getTime() >= sinceTime)
   }
 
   // Sort newest first
   logs = logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
-  if (!date) {
+  if (!date && !since) {
     logs = logs.slice(0, limit)
   }
 
