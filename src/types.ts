@@ -14,6 +14,9 @@ export interface Status {
   enabled: boolean
   order: number
   pinned: boolean
+  status_category?: 'task' | 'badge'
+  criteria?: string
+  valence?: 'positive' | 'negative'
 }
 
 export interface LogEntry {

@@ -27,7 +27,7 @@ export default function Home() {
         api.getContexts(),
       ])
 
-      const enabled = allStatuses.filter(s => s.enabled)
+      const enabled = allStatuses.filter(s => s.enabled && s.status_category !== 'badge')
       const map = Object.fromEntries(allStatuses.map(s => [s.id, s]))
       setStatusMap(map)
       setRecentLogs(logs)

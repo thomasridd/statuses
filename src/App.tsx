@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Analytics from './pages/Analytics'
 import Library from './pages/Library'
 import Goals from './pages/Goals'
+import Badges from './pages/Badges'
 
 type AuthState = 'checking' | 'authed' | 'login'
 
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/goals" element={<Goals />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/library" element={<Library />} />
+        <Route path="/badges" element={<Badges />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
