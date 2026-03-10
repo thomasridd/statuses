@@ -17,9 +17,90 @@ Run with `netlify dev` (via the Netlify CLI) rather than plain `vite` so that se
 
 **Backend** — Netlify serverless functions in `netlify/functions/`. Each file exports a default `async (request: Request)` handler and an `export const config = { path: '/api/<name>' }`.
 
-**Storage** — Netlify Blobs (`getStore('app-data')`). Keys: `motives`, `statuses`, `contexts`, `logs`. All reads fall back to defaults from `netlify/functions/defaultData.ts` when no data exists yet.
+**Storage** — Netlify Blobs (`getStore('app-data')`). Keys: `motives`, `statuses`, `contexts`, `logs`, `gold-stars`. All reads fall back to defaults from `netlify/functions/defaultData.ts` when no data exists yet.
 
-**Auth** — Single-user password gate. Password stored in `process.env.APP_PASSWORD`. Every API request must include the `x-app-password` header.
+**Auth** — Single-user password gate. Password stored in `process.env.APP_PASSWORD`. Every API request must include the `x-app-password` header. Password is stored in `sessionStorage` after login.
+
+## Project structure
+
+```
+src/
+  types.ts              All shared TypeScript interfaces
+  main.tsx              Entry point
+  App.tsx               Auth gate + React Router routes
+  lib/
+    api.ts              Typed API client (injects auth header)
+    format.ts           Formatting helpers (time, date, labels)
+  components/
+    StatusCard.tsx      Status tile with Me/Team log buttons
+    ValueModal.tsx      Custom value input modal
+    LoginGate.tsx       Password authentication form
+    NavBar.tsx          Bottom navigation bar (5 links)
+    Toast.tsx           Auto-dismissing notification (2.5s)
+    GoldStarCard.tsx    Goal display card
+    GoldStarModal.tsx   Goal create/edit form
+  pages/
+    Home.tsx            Primary logging interface
+    Analytics.tsx       Daily summary & weekly analytics
+    Library.tsx         Status library + context management
+    Badges.tsx          Badge achievement system
+    Goals.tsx           Gold star goals management
+netlify/
+  functions/
+    defaultData.ts      Default statuses, motives, and contexts
+    statuses.ts         GET / PUT /api/statuses
+    contexts.ts         GET / PUT /api/contexts
+    log.ts              POST /api/log
+    logs.ts             GET /api/logs
+    summary.ts          GET /api/summary
+    gold-stars.ts       GET / PUT /api/gold-stars
+    reset.ts            POST /api/reset
+netlify.toml
+```
+
+## Data model
+
+```typescript
+Motive      { id, name, order }
+
+Status      { id, label, motive_id, type, unit, default_value,
+              enabled, order, pinned,
+              status_category?,   // 'task' | 'badge'
+              criteria?,          // human-readable badge criteria
+              valence? }          // 'positive' | 'negative' (badges)
+
+Context     { id, name, order, statuses: ContextMembership[] }
+ContextMembership  { status_id, order }
+
+LogEntry    { id, status_id, timestamp, value?, logged_by }
+            // logged_by: 'me' | 'team' — defaults to 'me'
+            // timestamp: always "now" (ISO 8601), never backdated
+
+GoldStar    { id, caption, notes, created_at, completed_at?, order }
+```
+
+**Status types:** `simple` (timestamp only) | `value` (timestamp + numeric)
+
+**Contexts** are named collections of statuses (e.g. *Morning routine*, *In the kitchen*). A status can belong to multiple contexts, with an independent `order` within each. The home page groups enabled statuses by context; statuses not in any context appear under *Other*.
+
+**Badges** are statuses with `status_category: 'badge'`. They are shown on the Badges page, not the home page. They have a `criteria` description and a `valence` (`'positive'` for achievements, `'negative'` for demerits). A badge can be earned once per day.
+
+## API endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/statuses` | Returns `{ motives, statuses }` |
+| PUT | `/api/statuses` | Accepts `{ motives?, statuses? }` |
+| GET | `/api/contexts` | Returns `{ contexts }` |
+| PUT | `/api/contexts` | Accepts `{ contexts }` |
+| GET | `/api/logs` | Returns `{ logs }`, query params: `date`, `since`, `limit` (default 50) |
+| POST | `/api/log` | Body: `{ status_id, logged_by?, value? }` — timestamp is always "now" |
+| GET | `/api/summary` | Returns today + weekly aggregates; query params: `week`, `today` |
+| GET | `/api/gold-stars` | Returns `{ goldStars }` |
+| PUT | `/api/gold-stars` | Accepts `{ goldStars }` |
+| POST | `/api/reset` | Resets motives, statuses, contexts to defaults |
+
+All endpoints require `x-app-password` header.
 
 ## Key files
 
@@ -27,46 +108,74 @@ Run with `netlify dev` (via the Netlify CLI) rather than plain `vite` so that se
 |------|---------|
 | `src/types.ts` | All shared TypeScript interfaces |
 | `src/lib/api.ts` | Typed API client (injects auth header) |
+| `src/lib/format.ts` | `formatTime`, `formatDate`, `formatStatusLabel`, `todayISO` |
 | `src/pages/Home.tsx` | Primary logging interface |
 | `src/pages/Analytics.tsx` | Daily summary & weekly analytics |
 | `src/pages/Library.tsx` | Status library + context management |
-| `netlify/functions/defaultData.ts` | ~120 default statuses, motives, and contexts |
-| `netlify/functions/contexts.ts` | GET / PUT `/api/contexts` |
-| `netlify/functions/statuses.ts` | GET / PUT `/api/statuses` |
-| `netlify/functions/log.ts` | POST `/api/log` |
-| `netlify/functions/logs.ts` | GET `/api/logs` |
-| `netlify/functions/summary.ts` | GET `/api/summary` |
-
-## Data model
-
-```
-Motive       { id, name, order }
-Status       { id, label, motive_id, type, unit, default_value, enabled, order, pinned }
-Context      { id, name, order, statuses: ContextMembership[] }
-ContextMembership  { status_id, order }
-LogEntry     { id, status_id, timestamp, value? }
-```
-
-**Status types:** `simple` (timestamp only) | `value` (timestamp + numeric)
-
-**Contexts** are named collections of statuses (e.g. *Morning routine*, *In the kitchen*). A status can belong to multiple contexts, with an independent `order` within each. The home page groups enabled statuses by context; statuses not in any context appear under *Other*.
+| `src/pages/Badges.tsx` | Badge achievement tracking |
+| `src/pages/Goals.tsx` | Gold star goals |
+| `netlify/functions/defaultData.ts` | Default statuses (43), motives (5), and contexts (5) |
 
 ## Home page behaviour
 
-- **No search:** statuses shown grouped by context (context order → status order within context)
-- **Searching:** flat filtered list across all enabled statuses
-- Simple status → logs immediately on tap
-- Value status → logs with `default_value` on tap; edit icon opens `ValueModal` for a custom value
+- **"Today" boundary:** 4:30 AM — if the current time is before 4:30 AM, "today" means the previous calendar day
+- **No search:** statuses shown grouped by context (context order → status order within context); badge statuses are excluded
+- **Searching:** flat filtered list across all enabled non-badge statuses
+- Simple status → logs immediately on tap (separate "Me" / "Team" buttons)
+- Value status → logs with `default_value` on tap ("Me" / "Team"); edit icon opens `ValueModal` for a custom value
+- Recent activity (last 20 logs) shown below the status grid
 
 ## Library page
 
 Two tabs:
 
-- **Statuses** — enable/disable, pin, reorder within motive category
+- **Statuses** — enable/disable, pin, reorder within motive category; reset to defaults button
 - **Contexts** — create/delete contexts; add/remove/reorder statuses within each context; reorder contexts themselves
+
+## Badges page
+
+- Displays statuses filtered by `status_category === 'badge'`
+- Two sections: **Achievements** (`valence: 'positive'`) and **Demerits** (`valence: 'negative'`)
+- Each badge can be earned once per day; earning it creates a log entry
+- Visual: ⬜ not earned → 🏅 achievement earned / 🚨 demerit earned
+
+## Goals page
+
+- Create, edit, complete, and delete gold star goals (`GoldStar`)
+- Goals are ordered by `order` field; completed goals are shown collapsed at the bottom
+- `GoldStarModal` handles both create (null arg) and edit (existing goal) modes
+
+## Analytics page
+
+- Week navigation (prev/next/this week); week = Monday–Sunday
+- **Today section:** all logs from today grouped by motive
+- **Week value totals:** sum of numeric values per value status
+- **Week simple counts:** count per simple status
+
+## Default data (netlify/functions/defaultData.ts)
+
+5 motives: Kitchen, Domestic grind, Family, Bathroom, Badges
+
+43 statuses (all enabled by default):
+- Kitchen (7 simple): Cooked a meal, Meal Planned, Tidy kitchen, Dishwasher loaded/unloaded, Surfaces cleaned, Bins
+- Domestic grind (5 simple): Laundry loaded/cranked/put away, Tidied to zero, Kelvin run
+- Family (10 simple): Supervised homework, Oversaw piano, Coffee, Tea, Snack, Kid bath, Kid bedtime, Online grocery shop, Top up shop, Put house to bed
+- Bathroom (2 simple): Teeth, Wash
+- Badges (6, `status_category: 'badge'`): Up and out, Robo-ready, Home cooked, Big napper, Good lad, Golden bedtime
+
+5 default contexts: Food and Drink, Kitchen, Domestic grind, Family, Bathroom
 
 ## Adding a new API endpoint
 
 1. Create `netlify/functions/<name>.ts` with a default handler and `export const config = { path: '/api/<name>' }`
 2. Add a typed wrapper in `src/lib/api.ts`
 3. Add the corresponding response type(s) to `src/types.ts`
+
+## Key conventions
+
+- **IDs** are generated as `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+- **Ordering** uses integer `order` fields; the UI manages reordering by updating these fields and calling the relevant PUT endpoint
+- **Netlify Blobs** reads always fall back to `defaultData.ts` — never throw on missing keys
+- **Auth errors** from the API throw an `AuthError` class (defined in `src/lib/api.ts`); `App.tsx` catches these to show the login gate
+- **Toast** notifications are shown after logging actions and reset via `setTimeout` in the component
+- All function handlers follow the Web Fetch API (`Request` → `Response`) — not the older Lambda-style handler
