@@ -28,13 +28,14 @@ export const defaultStatuses: Status[] = [
   // Family
   { id: 'supervised_homework', label: 'Supervised homework 📚', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
   { id: 'oversaw_piano_practice', label: 'Oversaw piano practice 🎹', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
-  { id: 'drank_coffee', label: 'Drank Coffee ☕️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
-  { id: 'drank_tea', label: 'Drank Tea 🫖', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'task' },
-  { id: 'kid_bath', label: 'Kid bath 🛁', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'task' },
-  { id: 'kid_bedtime', label: 'Kid bedtime 🛏️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
-  { id: 'online_grocery_shop', label: 'Online grocery shop 📱', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'task' },
-  { id: 'top_up_shop', label: 'Top up shop 🛒', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'task' },
-  { id: 'put_the_house_to_bed', label: 'Put the house to bed 🌙', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 9, pinned: false, status_category: 'task' },
+  { id: 'drank_coffee', label: 'Coffee ☕️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
+  { id: 'drank_tea', label: 'Tea 🫖', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'task' },
+  { id: 'snack', label: 'Snack 🍪', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'task' },
+  { id: 'kid_bath', label: 'Kid bath 🛁', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
+  { id: 'kid_bedtime', label: 'Kid bedtime 🛏️', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'task' },
+  { id: 'online_grocery_shop', label: 'Online grocery shop 📱', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'task' },
+  { id: 'top_up_shop', label: 'Top up shop 🛒', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 9, pinned: false, status_category: 'task' },
+  { id: 'put_the_house_to_bed', label: 'Put the house to bed 🌙', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 10, pinned: false, status_category: 'task' },
 
   // Bathroom
   { id: 'teeth', label: 'Teeth 🦷', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
@@ -52,9 +53,19 @@ export const defaultStatuses: Status[] = [
 
 export const defaultContexts: Context[] = [
   {
+    id: 'food_and_drink',
+    name: 'Food and Drink',
+    order: 1,
+    statuses: [
+      { status_id: 'drank_coffee', order: 1 },
+      { status_id: 'drank_tea', order: 2 },
+      { status_id: 'snack', order: 3 },
+    ],
+  },
+  {
     id: 'kitchen',
     name: 'Kitchen',
-    order: 1,
+    order: 2,
     statuses: [
       { status_id: 'cooked_a_meal', order: 1 },
       { status_id: 'meal_planned', order: 2 },
@@ -68,7 +79,7 @@ export const defaultContexts: Context[] = [
   {
     id: 'domestic_grind',
     name: 'Domestic grind',
-    order: 2,
+    order: 3,
     statuses: [
       { status_id: 'laundry_loaded', order: 1 },
       { status_id: 'laundry_cranked', order: 2 },
@@ -80,23 +91,21 @@ export const defaultContexts: Context[] = [
   {
     id: 'family',
     name: 'Family',
-    order: 3,
+    order: 4,
     statuses: [
       { status_id: 'supervised_homework', order: 1 },
       { status_id: 'oversaw_piano_practice', order: 2 },
-      { status_id: 'drank_coffee', order: 3 },
-      { status_id: 'drank_tea', order: 4 },
-      { status_id: 'kid_bath', order: 5 },
-      { status_id: 'kid_bedtime', order: 6 },
-      { status_id: 'online_grocery_shop', order: 7 },
-      { status_id: 'top_up_shop', order: 8 },
-      { status_id: 'put_the_house_to_bed', order: 9 },
+      { status_id: 'kid_bath', order: 3 },
+      { status_id: 'kid_bedtime', order: 4 },
+      { status_id: 'online_grocery_shop', order: 5 },
+      { status_id: 'top_up_shop', order: 6 },
+      { status_id: 'put_the_house_to_bed', order: 7 },
     ],
   },
   {
     id: 'bathroom',
     name: 'Bathroom',
-    order: 4,
+    order: 5,
     statuses: [
       { status_id: 'teeth', order: 1 },
       { status_id: 'wash', order: 2 },
