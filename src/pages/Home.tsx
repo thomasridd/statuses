@@ -44,7 +44,7 @@ export default function Home() {
   const [statusMap, setStatusMap] = useState<Record<string, Status>>({})
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
-  const [customEntry, setCustomEntry] = useState<{ status: Status; logged_by: 'me' | 'team' } | null>(null)
+  const [customEntry, setCustomEntry] = useState<Status | null>(null)
   const [logging, setLogging] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -74,14 +74,13 @@ export default function Home() {
     loadData()
   }, [loadData])
 
-  async function logStatus(status: Status, logged_by: 'me' | 'team', value?: number) {
+  async function logStatus(status: Status, value?: number) {
     setLogging(true)
     try {
       const logValue = value !== undefined ? value : (status.type === 'value' ? status.default_value ?? undefined : undefined)
-      await api.postLog(status.id, logged_by, logValue)
+      await api.postLog(status.id, logValue)
       const label = formatStatusLabel(status, logValue ?? null)
-      const who = logged_by === 'team' ? 'team' : 'me'
-      setToast(`Logged for ${who}: ${label}`)
+      setToast(`Logged: ${label}`)
       const todayStart = getTodayStart()
       const [{ logs }, { logs: todayLogs }] = await Promise.all([
         api.getLogs({ limit: 20 }),
@@ -96,14 +95,14 @@ export default function Home() {
     }
   }
 
-  function handleLogCustom(status: Status, logged_by: 'me' | 'team') {
-    setCustomEntry({ status, logged_by })
+  function handleLogCustom(status: Status) {
+    setCustomEntry(status)
   }
 
   async function handleCustomConfirm(value: number) {
     const entry = customEntry
     setCustomEntry(null)
-    if (entry) await logStatus(entry.status, entry.logged_by, value)
+    if (entry) await logStatus(entry, value)
   }
 
   const enabledStatusIds = new Set(statuses.map(s => s.id))
@@ -237,9 +236,6 @@ export default function Home() {
                         <span className="text-sm text-gray-800 flex-1">
                           {formatStatusLabel(status, entry.value)}
                         </span>
-                        <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${entry.logged_by === 'team' ? 'bg-violet-100 text-violet-700' : 'bg-sky-100 text-sky-700'}`}>
-                          {entry.logged_by === 'team' ? 'team' : 'me'}
-                        </span>
                       </div>
                     )
                   })}
@@ -252,7 +248,7 @@ export default function Home() {
 
       <Toast message={toast} onDismiss={() => setToast('')} />
       <ValueModal
-        status={customEntry?.status ?? null}
+        status={customEntry}
         onConfirm={handleCustomConfirm}
         onCancel={() => setCustomEntry(null)}
       />

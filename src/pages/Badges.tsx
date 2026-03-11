@@ -48,7 +48,7 @@ export default function Badges() {
     if (alreadyEarned) return
     setLogging(true)
     try {
-      await api.postLog(badge.id, 'me')
+      await api.postLog(badge.id)
       setToast(`Earned: ${badge.label}`)
       const { logs } = await api.getLogs({ limit: 200 })
       setTodayLogs(logs.filter(l => isToday(l.timestamp)))

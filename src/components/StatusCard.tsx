@@ -8,8 +8,8 @@ interface StatusTodayStats {
 
 interface StatusCardProps {
   status: Status
-  onLog: (status: Status, logged_by: 'me' | 'team') => void
-  onLogCustom: (status: Status, logged_by: 'me' | 'team') => void
+  onLog: (status: Status) => void
+  onLogCustom: (status: Status) => void
   disabled?: boolean
   todayStats?: StatusTodayStats
 }
@@ -36,17 +36,10 @@ export default function StatusCard({ status, onLog, onLogCustom, disabled, today
       </span>
       <button
         className="shrink-0 px-3 py-2.5 text-xs font-medium text-sky-700 bg-sky-50 hover:bg-sky-100 active:bg-sky-200 disabled:opacity-50 border-l border-gray-100"
-        onClick={() => isValue ? onLogCustom(status, 'me') : onLog(status, 'me')}
+        onClick={() => isValue ? onLogCustom(status) : onLog(status)}
         disabled={disabled}
       >
-        Me
-      </button>
-      <button
-        className="shrink-0 px-3 py-2.5 text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 active:bg-violet-200 disabled:opacity-50 border-l border-gray-100"
-        onClick={() => isValue ? onLogCustom(status, 'team') : onLog(status, 'team')}
-        disabled={disabled}
-      >
-        Team
+        Log
       </button>
     </div>
   )
