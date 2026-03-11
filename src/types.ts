@@ -24,7 +24,6 @@ export interface LogEntry {
   status_id: string
   timestamp: string
   value: number | null
-  logged_by: 'me' | 'team'
 }
 
 export interface TodayEntry {
