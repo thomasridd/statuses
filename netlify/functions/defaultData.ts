@@ -10,7 +10,7 @@ export const defaultMotives: Motive[] = [
 
 export const defaultStatuses: Status[] = [
   // Kitchen
-  { id: 'cooked_a_meal', label: 'Cooked a meal 🧑‍🍳', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
+  { id: 'cooked_a_meal', label: 'Healthy, home cooked meal 🧑‍🍳', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
   { id: 'dishwasher_loaded', label: 'Dishwasher loaded 💦', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
   { id: 'dishwasher_unloaded', label: 'Dishwasher unloaded 🍽️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
   { id: 'surfaces_cleaned', label: 'Surfaces cleaned 🧽', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'task' },
@@ -55,9 +55,10 @@ export const defaultContexts: Context[] = [
     name: 'Food and Drink',
     order: 1,
     statuses: [
-      { status_id: 'drank_coffee', order: 1 },
-      { status_id: 'drank_tea', order: 2 },
-      { status_id: 'snack', order: 3 },
+      { status_id: 'cooked_a_meal', order: 1 },
+      { status_id: 'drank_coffee', order: 2 },
+      { status_id: 'drank_tea', order: 3 },
+      { status_id: 'snack', order: 4 },
     ],
   },
   {
@@ -65,11 +66,10 @@ export const defaultContexts: Context[] = [
     name: 'Kitchen',
     order: 2,
     statuses: [
-      { status_id: 'cooked_a_meal', order: 1 },
-      { status_id: 'dishwasher_loaded', order: 2 },
-      { status_id: 'dishwasher_unloaded', order: 3 },
-      { status_id: 'surfaces_cleaned', order: 4 },
-      { status_id: 'bins', order: 5 },
+      { status_id: 'dishwasher_loaded', order: 1 },
+      { status_id: 'dishwasher_unloaded', order: 2 },
+      { status_id: 'surfaces_cleaned', order: 3 },
+      { status_id: 'bins', order: 4 },
     ],
   },
   {
