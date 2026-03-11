@@ -25,6 +25,11 @@ export const defaultStatuses: Status[] = [
   { id: 'bedsheets', label: 'Bedsheets 🛏️', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
   { id: 'towels', label: 'Towels 🧖‍♀️', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'task' },
 
+  // Food and Drink (statuses)
+  { id: 'drank_coffee', label: 'Coffee ☕️', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
+  { id: 'drank_tea', label: 'Tea 🫖', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'task' },
+  { id: 'snack', label: 'Snack 🍪', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'task' },
+
   // Family
   { id: 'online_grocery_shop', label: 'Online grocery shop 📱', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
   { id: 'top_up_shop', label: 'Top up shop 🛒', motive_id: 'family', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
@@ -50,6 +55,9 @@ export const defaultContexts: Context[] = [
     order: 1,
     statuses: [
       { status_id: 'cooked_a_meal', order: 1 },
+      { status_id: 'drank_coffee', order: 2 },
+      { status_id: 'drank_tea', order: 3 },
+      { status_id: 'snack', order: 4 },
     ],
   },
   {
