@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { api, AuthError } from './lib/api'
 import LoginGate from './components/LoginGate'
 import Home from './pages/Home'
@@ -9,6 +9,14 @@ import Goals from './pages/Goals'
 import Badges from './pages/Badges'
 
 type AuthState = 'checking' | 'authed' | 'login'
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
 
 export default function App() {
   const [authState, setAuthState] = useState<AuthState>('checking')
@@ -46,6 +54,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/goals" element={<Goals />} />
