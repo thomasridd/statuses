@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
-import { formatTime, formatStatusLabel } from '../lib/format'
+import { formatTime, formatStatusLabel, formatValueWithUnit } from '../lib/format'
 import NavBar from '../components/NavBar'
 import type { SummaryResponse } from '../types'
 
@@ -108,7 +108,7 @@ export default function Analytics() {
                     .map(({ status, total }) => (
                       <div key={status.id} className="flex items-center justify-between px-4 py-3 border-b last:border-0 border-gray-100">
                         <span className="text-sm text-gray-800">{status.label}</span>
-                        <span className="text-sm font-semibold text-sky-700">{total} {status.unit}</span>
+                        <span className="text-sm font-semibold text-sky-700">{formatValueWithUnit(total, status.unit)}</span>
                       </div>
                     ))}
                 </div>
