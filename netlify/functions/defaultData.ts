@@ -42,9 +42,12 @@ export const defaultStatuses: Status[] = [
   { id: 'badge_up_and_out', label: 'Up and out ⏰', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'badge', criteria: 'Out of the house before 8.20', valence: 'positive' },
   { id: 'badge_robo_ready', label: 'Robo-ready 🤖', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'badge', criteria: 'Starting Kelvin on the up and out', valence: 'positive' },
   { id: 'badge_home_cooked', label: 'Home cooked 🥗', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'badge', criteria: '3 healthy home cooked meals', valence: 'positive' },
-  { id: 'badge_big_napper', label: 'Big napper 👩‍🍼', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'badge', criteria: 'Nap off at least 2 hours', valence: 'negative' },
+  { id: 'badge_big_napper', label: 'Big napper 👩‍🍼', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'badge', criteria: 'Nap off at least 2 hours', valence: 'positive' },
   { id: 'badge_good_lad', label: 'Good lad ⭐', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'badge', criteria: 'Attitude star', valence: 'positive' },
   { id: 'badge_golden_bedtime', label: 'Golden bedtime 🛌', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'badge', criteria: 'Down by 8.35', valence: 'positive' },
+  { id: 'badge_street_picnic', label: 'Street Picnic 🥪', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 7, pinned: false, status_category: 'badge', criteria: 'Lunch off a meal deal', valence: 'negative' },
+  { id: 'badge_lazy_cafe', label: 'Lazy Cafe 🍟', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'badge', criteria: 'Eat out through laziness', valence: 'negative' },
+  { id: 'badge_default_delivery', label: 'Default delivery 🍕', motive_id: 'badges', type: 'simple', unit: null, default_value: null, enabled: true, order: 9, pinned: false, status_category: 'badge', criteria: 'Get take out', valence: 'negative' },
 
 ]
 
