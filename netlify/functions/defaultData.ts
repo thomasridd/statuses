@@ -19,7 +19,7 @@ export const defaultStatuses: Status[] = [
   // Domestic grind
   { id: 'laundry_cranked', label: 'Laundry cranked 🧺', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
   { id: 'laundry_put_away', label: 'Laundry put away 🧦', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 2, pinned: false, status_category: 'task' },
-  { id: 'tidied_to_zero', label: 'Tidied to zero 🧹', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
+  { id: 'tidied_to_zero', label: 'Toys away 🧸', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 3, pinned: false, status_category: 'task' },
   { id: 'kelvin_run', label: 'Kelvin run 🤖', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 4, pinned: false, status_category: 'task' },
   { id: 'bedsheets', label: 'Bedsheets 🛏️', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 5, pinned: false, status_category: 'task' },
   { id: 'towels', label: 'Towels 🧖‍♀️', motive_id: 'domestic_grind', type: 'simple', unit: null, default_value: null, enabled: true, order: 6, pinned: false, status_category: 'task' },
