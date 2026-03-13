@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
 import { formatTime, formatStatusLabel, formatValueWithUnit } from '../lib/format'
-import NavBar from '../components/NavBar'
 import type { SummaryResponse } from '../types'
 
 interface WeekNavProps {
@@ -51,8 +50,8 @@ export default function Analytics() {
   }, [weekDate])
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 safe-top">
+    <div className="min-h-screen bg-gray-50 pt-12">
+      <header className="bg-white border-b border-gray-200 sticky top-12 z-40">
         <div className="px-4 py-3">
           <h1 className="text-lg font-bold text-gray-900 mb-3">Analytics</h1>
           <WeekNav weekDate={weekDate} onChange={setWeekDate} />
@@ -143,7 +142,6 @@ export default function Analytics() {
         )}
       </main>
 
-      <NavBar />
     </div>
   )
 }

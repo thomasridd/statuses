@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
-import NavBar from '../components/NavBar'
 import Toast from '../components/Toast'
 import type { Motive, Status, Context } from '../types'
 
@@ -207,8 +206,8 @@ export default function Library() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 safe-top">
+    <div className="min-h-screen bg-gray-50 pt-12">
+      <header className="bg-white border-b border-gray-200 sticky top-12 z-40">
         <div className="px-4 py-3">
           <div className="flex items-center gap-3 mb-3">
             <h1 className="text-lg font-bold text-gray-900">Library</h1>
@@ -510,7 +509,6 @@ export default function Library() {
       )}
 
       <Toast message={toast} onDismiss={() => setToast('')} />
-      <NavBar />
     </div>
   )
 }

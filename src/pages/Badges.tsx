@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../lib/api'
 import { todayISO } from '../lib/format'
-import NavBar from '../components/NavBar'
 import Toast from '../components/Toast'
 import DayNav from '../components/DayNav'
 import type { Status, LogEntry } from '../types'
@@ -68,8 +67,8 @@ export default function Badges() {
   const isToday = selectedDate === todayISO()
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 safe-top">
+    <div className="min-h-screen bg-gray-50 pt-12">
+      <header className="bg-white border-b border-gray-200 sticky top-12 z-40">
         <div className="px-4 py-3">
           <h1 className="text-lg font-bold text-gray-900">Badges</h1>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -180,7 +179,6 @@ export default function Badges() {
       </main>
 
       <Toast message={toast} onDismiss={() => setToast('')} />
-      <NavBar />
     </div>
   )
 }
