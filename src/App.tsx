@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { api, AuthError } from './lib/api'
 import LoginGate from './components/LoginGate'
+import NavBar from './components/NavBar'
 import Home from './pages/Home'
 import Analytics from './pages/Analytics'
 import Library from './pages/Library'
@@ -46,6 +47,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <NavBar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/goals" element={<Goals />} />

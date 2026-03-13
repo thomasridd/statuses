@@ -5,7 +5,6 @@ import { formatTime, formatDate, formatStatusLabel, todayISO } from '../lib/form
 import StatusCard from '../components/StatusCard'
 import ValueModal from '../components/ValueModal'
 import Toast from '../components/Toast'
-import NavBar from '../components/NavBar'
 import DayNav from '../components/DayNav'
 import type { Status, LogEntry, Context } from '../types'
 
@@ -145,8 +144,8 @@ export default function Home() {
   const activityTitle = isActualToday ? 'Recent activity' : 'Day activity'
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 safe-top">
+    <div className="min-h-screen bg-gray-50 pt-12">
+      <header className="bg-white border-b border-gray-200 sticky top-12 z-40">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-bold text-gray-900">Status Logger</h1>
@@ -246,7 +245,6 @@ export default function Home() {
         onConfirm={handleCustomConfirm}
         onCancel={() => setCustomEntry(null)}
       />
-      <NavBar />
     </div>
   )
 }
