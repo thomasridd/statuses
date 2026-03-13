@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { formatTime, formatDate, formatStatusLabel, todayISO } from '../lib/format'
@@ -11,6 +11,7 @@ import type { Status, LogEntry, Context } from '../types'
 interface StatusTodayStats {
   count: number
   lastAt: string
+  total?: number
 }
 
 function getTodayStart(): Date {
@@ -23,7 +24,7 @@ function getTodayStart(): Date {
   return cutoff
 }
 
-function computeTodayStats(logs: LogEntry[]): Record<string, StatusTodayStats> {
+function computeTodayStats(logs: LogEntry[], statusMap: Record<string, Status>): Record<string, StatusTodayStats> {
   const stats: Record<string, StatusTodayStats> = {}
   // logs are sorted newest first
   for (const entry of logs) {
@@ -31,6 +32,10 @@ function computeTodayStats(logs: LogEntry[]): Record<string, StatusTodayStats> {
       stats[entry.status_id] = { count: 1, lastAt: entry.timestamp }
     } else {
       stats[entry.status_id].count++
+    }
+    const status = statusMap[entry.status_id]
+    if (status?.type === 'value' && entry.value != null) {
+      stats[entry.status_id].total = (stats[entry.status_id].total ?? 0) + entry.value
     }
   }
   return stats
@@ -42,6 +47,7 @@ export default function Home() {
   const [recentLogs, setRecentLogs] = useState<LogEntry[]>([])
   const [todayStats, setTodayStats] = useState<Record<string, StatusTodayStats>>({})
   const [statusMap, setStatusMap] = useState<Record<string, Status>>({})
+  const statusMapRef = useRef<Record<string, Status>>({})
   const [toast, setToast] = useState('')
   const [customEntry, setCustomEntry] = useState<Status | null>(null)
   const [logging, setLogging] = useState(false)
@@ -69,6 +75,7 @@ export default function Home() {
 
       const enabled = allStatuses.filter(s => s.enabled && s.status_category !== 'badge')
       const map = Object.fromEntries(allStatuses.map(s => [s.id, s]))
+      statusMapRef.current = map
       setStatusMap(map)
       setContexts(allContexts.sort((a, b) => a.order - b.order))
       setStatuses(enabled)
@@ -83,7 +90,7 @@ export default function Home() {
       fetchDayLogs(date),
       isToday ? api.getLogs({ limit: 20 }) : api.getLogs({ date }),
     ])
-    setTodayStats(computeTodayStats(dayLogs))
+    setTodayStats(computeTodayStats(dayLogs, statusMapRef.current))
     setRecentLogs(recentResult.logs)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
