@@ -50,10 +50,10 @@ export const api = {
     const q = new URLSearchParams(params as Record<string, string>).toString()
     return apiFetch<LogsResponse>(`/logs${q ? '?' + q : ''}`)
   },
-  postLog: (status_id: string, value?: number | null) =>
+  postLog: (status_id: string, value?: number | null, timestamp?: string) =>
     apiFetch<PostLogResponse>('/log', {
       method: 'POST',
-      body: JSON.stringify({ status_id, value }),
+      body: JSON.stringify({ status_id, value, ...(timestamp ? { timestamp } : {}) }),
     }),
   getSummary: (params: Record<string, string> = {}) => {
     const q = new URLSearchParams(params).toString()
