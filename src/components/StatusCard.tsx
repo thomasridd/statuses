@@ -1,9 +1,10 @@
-import { formatTime } from '../lib/format'
+import { formatTime, formatValueWithUnit, isCurrencyUnit } from '../lib/format'
 import type { Status } from '../types'
 
 interface StatusTodayStats {
   count: number
   lastAt: string
+  total?: number
 }
 
 interface StatusCardProps {
@@ -14,10 +15,13 @@ interface StatusCardProps {
   todayStats?: StatusTodayStats
 }
 
-function formatSubtitle(stats: StatusTodayStats): string {
+function formatSubtitle(stats: StatusTodayStats, status: Status): string {
   const time = formatTime(stats.lastAt)
-  if (stats.count === 1) return `Once · ${time}`
-  return `${stats.count}× · ${time}`
+  const countPart = stats.count === 1 ? `Once · ${time}` : `${stats.count}× · ${time}`
+  if (stats.total != null && isCurrencyUnit(status.unit ?? null)) {
+    return `${countPart} · ${formatValueWithUnit(stats.total, status.unit ?? null)} total`
+  }
+  return countPart
 }
 
 export default function StatusCard({ status, onLog, onLogCustom, disabled, todayStats }: StatusCardProps) {
@@ -29,7 +33,7 @@ export default function StatusCard({ status, onLog, onLogCustom, disabled, today
       <span className="flex-1 px-3 py-2.5 min-w-0">
         <span className="block text-sm font-medium text-gray-800 leading-snug truncate">{label}</span>
         {todayStats && (
-          <span className="block text-xs text-gray-400 leading-tight mt-0.5">{formatSubtitle(todayStats)}</span>
+          <span className="block text-xs text-gray-400 leading-tight mt-0.5">{formatSubtitle(todayStats, status)}</span>
         )}
       </span>
       <button
