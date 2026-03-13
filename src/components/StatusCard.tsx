@@ -1,4 +1,4 @@
-import { formatTime, formatStatusLabel } from '../lib/format'
+import { formatTime } from '../lib/format'
 import type { Status } from '../types'
 
 interface StatusTodayStats {
@@ -22,7 +22,7 @@ function formatSubtitle(stats: StatusTodayStats): string {
 
 export default function StatusCard({ status, onLog, onLogCustom, disabled, todayStats }: StatusCardProps) {
   const isValue = status.type === 'value'
-  const label = formatStatusLabel(status)
+  const label = status.label
 
   return (
     <div className="flex items-center rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white">
