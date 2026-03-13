@@ -31,10 +31,10 @@ export const defaultStatuses: Status[] = [
   { id: 'snack', label: 'Snack 🍪', motive_id: 'kitchen', type: 'simple', unit: null, default_value: null, enabled: true, order: 8, pinned: false, status_category: 'task' },
 
   // Family
-  { id: 'online_grocery_shop', label: 'Big shop 📱', motive_id: 'family', type: 'value', unit: '£', default_value: 80, enabled: true, order: 1, pinned: false, status_category: 'task' },
+  { id: 'online_grocery_shop', label: 'Big shop 🛒', motive_id: 'family', type: 'value', unit: '£', default_value: 80, enabled: true, order: 1, pinned: false, status_category: 'task' },
   { id: 'top_up_shop', label: 'Top up shop 🛒', motive_id: 'family', type: 'value', unit: '£', default_value: 20, enabled: true, order: 2, pinned: false, status_category: 'task' },
-  { id: 'lazy_cafe', label: 'Lazy cafe 🍟', motive_id: 'family', type: 'value', unit: '£', default_value: 8, enabled: true, order: 3, pinned: false, status_category: 'task' },
-  { id: 'default_delivery', label: 'Default delivery 🍕', motive_id: 'family', type: 'value', unit: '£', default_value: 25, enabled: true, order: 4, pinned: false, status_category: 'task' },
+  { id: 'lazy_cafe', label: 'Eating out 🥣', motive_id: 'family', type: 'value', unit: '£', default_value: 25, enabled: true, order: 3, pinned: false, status_category: 'task' },
+  { id: 'default_delivery', label: 'Takeaway 🍕', motive_id: 'family', type: 'value', unit: '£', default_value: 25, enabled: true, order: 4, pinned: false, status_category: 'task' },
 
   // Bathroom
   { id: 'teeth', label: 'Teeth 🦷', motive_id: 'bathroom', type: 'simple', unit: null, default_value: null, enabled: true, order: 1, pinned: false, status_category: 'task' },
@@ -92,7 +92,7 @@ export const defaultContexts: Context[] = [
   },
   {
     id: 'family',
-    name: 'Family',
+    name: 'Money',
     order: 4,
     statuses: [
       { status_id: 'online_grocery_shop', order: 1 },
