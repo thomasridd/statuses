@@ -28,12 +28,13 @@ src/
   types.ts              All shared TypeScript interfaces
   main.tsx              Entry point
   App.tsx               Auth gate + React Router routes
+  householdTasks.json   Unused/reference task list (not loaded at runtime)
   lib/
     api.ts              Typed API client (injects auth header)
-    format.ts           Formatting helpers (time, date, labels)
+    format.ts           Formatting helpers (time, date, labels, currency)
   components/
-    StatusCard.tsx      Status tile with Me/Team log buttons
-    ValueModal.tsx      Custom value input modal
+    StatusCard.tsx      Status tile with a single Log button
+    ValueModal.tsx      Custom value input modal (for value-type statuses)
     LoginGate.tsx       Password authentication form
     NavBar.tsx          Bottom navigation bar (5 links)
     Toast.tsx           Auto-dismissing notification (2.5s)
@@ -72,16 +73,18 @@ Status      { id, label, motive_id, type, unit, default_value,
 Context     { id, name, order, statuses: ContextMembership[] }
 ContextMembership  { status_id, order }
 
-LogEntry    { id, status_id, timestamp, value?, logged_by }
-            // logged_by: 'me' | 'team' — defaults to 'me'
+LogEntry    { id, status_id, timestamp, value? }
             // timestamp: always "now" (ISO 8601), never backdated
+            // value: null for simple statuses; number for value statuses
 
 GoldStar    { id, caption, notes, created_at, completed_at?, order }
 ```
 
 **Status types:** `simple` (timestamp only) | `value` (timestamp + numeric)
 
-**Contexts** are named collections of statuses (e.g. *Morning routine*, *In the kitchen*). A status can belong to multiple contexts, with an independent `order` within each. The home page groups enabled statuses by context; statuses not in any context appear under *Other*.
+**Value statuses** support a `unit` field. Units can be standard strings (e.g. `mins`, `ml`) or currency symbols (`£`, `$`, `€`, `¥`). Currency units are rendered as prefixes (e.g. `£25`), others as suffixes (e.g. `30mins`). The `isCurrencyUnit` helper in `format.ts` identifies currency units.
+
+**Contexts** are named collections of statuses (e.g. *Food and Drink*, *Kitchen*). A status can belong to multiple contexts, with an independent `order` within each. The home page groups enabled statuses by context; statuses not in any context appear under *Other*.
 
 **Badges** are statuses with `status_category: 'badge'`. They are shown on the Badges page, not the home page. They have a `criteria` description and a `valence` (`'positive'` for achievements, `'negative'` for demerits). A badge can be earned once per day.
 
@@ -94,7 +97,7 @@ GoldStar    { id, caption, notes, created_at, completed_at?, order }
 | GET | `/api/contexts` | Returns `{ contexts }` |
 | PUT | `/api/contexts` | Accepts `{ contexts }` |
 | GET | `/api/logs` | Returns `{ logs }`, query params: `date`, `since`, `limit` (default 50) |
-| POST | `/api/log` | Body: `{ status_id, logged_by?, value? }` — timestamp is always "now" |
+| POST | `/api/log` | Body: `{ status_id, value? }` — timestamp is always "now" |
 | GET | `/api/summary` | Returns today + weekly aggregates; query params: `week`, `today` |
 | GET | `/api/gold-stars` | Returns `{ goldStars }` |
 | PUT | `/api/gold-stars` | Accepts `{ goldStars }` |
@@ -108,22 +111,33 @@ All endpoints require `x-app-password` header.
 |------|---------|
 | `src/types.ts` | All shared TypeScript interfaces |
 | `src/lib/api.ts` | Typed API client (injects auth header) |
-| `src/lib/format.ts` | `formatTime`, `formatDate`, `formatStatusLabel`, `todayISO` |
+| `src/lib/format.ts` | `formatTime`, `formatDate`, `formatStatusLabel`, `formatValueWithUnit`, `isCurrencyUnit`, `todayISO` |
 | `src/pages/Home.tsx` | Primary logging interface |
 | `src/pages/Analytics.tsx` | Daily summary & weekly analytics |
 | `src/pages/Library.tsx` | Status library + context management |
 | `src/pages/Badges.tsx` | Badge achievement tracking |
 | `src/pages/Goals.tsx` | Gold star goals |
-| `netlify/functions/defaultData.ts` | Default statuses (43), motives (5), and contexts (5) |
+| `netlify/functions/defaultData.ts` | Default statuses (29), motives (5), and contexts (5) |
 
 ## Home page behaviour
 
 - **"Today" boundary:** 4:30 AM — if the current time is before 4:30 AM, "today" means the previous calendar day
 - **No search:** statuses shown grouped by context (context order → status order within context); badge statuses are excluded
 - **Searching:** flat filtered list across all enabled non-badge statuses
-- Simple status → logs immediately on tap (separate "Me" / "Team" buttons)
-- Value status → logs with `default_value` on tap ("Me" / "Team"); edit icon opens `ValueModal` for a custom value
+- Each status has a single **Log** button:
+  - Simple status → logs immediately on tap
+  - Value status → opens `ValueModal` to enter/confirm the value (default pre-filled)
+- Today stats (count + last logged time) are shown as a subtitle on each card when the status has been logged today
 - Recent activity (last 20 logs) shown below the status grid
+
+## StatusCard component
+
+`StatusCard` renders a single status row:
+- Shows the status label and optional today stats subtitle
+- Single **Log** button on the right:
+  - For `simple` statuses: calls `onLog(status)` directly
+  - For `value` statuses: calls `onLogCustom(status)` which opens `ValueModal`
+- Accepts `disabled` prop to prevent double-logging during a pending API call
 
 ## Library page
 
@@ -156,14 +170,20 @@ Two tabs:
 
 5 motives: Kitchen, Domestic grind, Family, Bathroom, Badges
 
-43 statuses (all enabled by default):
-- Kitchen (7 simple): Cooked a meal, Meal Planned, Tidy kitchen, Dishwasher loaded/unloaded, Surfaces cleaned, Bins
-- Domestic grind (5 simple): Laundry loaded/cranked/put away, Tidied to zero, Kelvin run
-- Family (10 simple): Supervised homework, Oversaw piano, Coffee, Tea, Snack, Kid bath, Kid bedtime, Online grocery shop, Top up shop, Put house to bed
+29 statuses (all enabled by default):
+- Kitchen motive (8 statuses, all simple):
+  - Cooked a meal, Dishwasher loaded, Dishwasher unloaded, Surfaces cleaned, Bins
+  - Coffee, Tea, Snack (food & drink statuses filed under the Kitchen motive)
+- Domestic grind (6 simple): Laundry cranked, Laundry put away, Toys away, Kelvin run, Bedsheets, Towels
+- Family (4 value, all with `£` currency unit): Big shop (£80), Top up shop (£20), Eating out (£25), Takeaway (£25)
 - Bathroom (2 simple): Teeth, Wash
-- Badges (6, `status_category: 'badge'`): Up and out, Robo-ready, Home cooked, Big napper, Good lad, Golden bedtime
+- Badges (9, `status_category: 'badge'`):
+  - Positive (6): Up and out, Robo-ready, Home cooked, Big napper, Good lad, Golden bedtime
+  - Negative (3): Street Picnic, Lazy Cafe, Default delivery
 
-5 default contexts: Food and Drink, Kitchen, Domestic grind, Family, Bathroom
+5 default contexts: Food and Drink, Kitchen, Domestic grind, Money, Bathroom
+
+Note: The "Money" context (id: `family`) contains the 4 family value statuses. The context `name` is "Money" even though its `id` is `'family'`.
 
 ## Adding a new API endpoint
 
@@ -173,9 +193,10 @@ Two tabs:
 
 ## Key conventions
 
-- **IDs** are generated as `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+- **IDs** are generated as `` `${Date.now()}_${Math.random().toString(36).slice(2, 7)}` ``
 - **Ordering** uses integer `order` fields; the UI manages reordering by updating these fields and calling the relevant PUT endpoint
 - **Netlify Blobs** reads always fall back to `defaultData.ts` — never throw on missing keys
 - **Auth errors** from the API throw an `AuthError` class (defined in `src/lib/api.ts`); `App.tsx` catches these to show the login gate
 - **Toast** notifications are shown after logging actions and reset via `setTimeout` in the component
+- **Currency units** (`£`, `$`, `€`, `¥`) are detected by `isCurrencyUnit()` and rendered as prefixes; all other units render as suffixes
 - All function handlers follow the Web Fetch API (`Request` → `Response`) — not the older Lambda-style handler
