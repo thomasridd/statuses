@@ -42,7 +42,6 @@ export default function Home() {
   const [recentLogs, setRecentLogs] = useState<LogEntry[]>([])
   const [todayStats, setTodayStats] = useState<Record<string, StatusTodayStats>>({})
   const [statusMap, setStatusMap] = useState<Record<string, Status>>({})
-  const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
   const [customEntry, setCustomEntry] = useState<Status | null>(null)
   const [logging, setLogging] = useState(false)
@@ -107,13 +106,6 @@ export default function Home() {
 
   const enabledStatusIds = new Set(statuses.map(s => s.id))
 
-  // For search: flat filtered list
-  const filtered = search.trim()
-    ? statuses.filter(s =>
-        s.label.toLowerCase().includes(search.trim().toLowerCase())
-      )
-    : []
-
   // For contexts view: build context sections with their enabled statuses
   const contextSections = contexts.map(ctx => ({
     context: ctx,
@@ -132,47 +124,19 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40 safe-top">
         <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between">
             <h1 className="text-lg font-bold text-gray-900">Status Logger</h1>
             <Link to="/analytics" className="text-sm text-sky-600 font-medium">
               Today's summary →
             </Link>
           </div>
-          <input
-            type="search"
-            placeholder="Search statuses…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full bg-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
-          />
         </div>
       </header>
 
       <main className="px-4 pt-4">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-400">Loading…</div>
-        ) : search.trim() ? (
-          // Search results: flat filtered list
-          <section>
-            {filtered.length === 0 ? (
-              <p className="text-center text-gray-400 text-sm py-8">No statuses found</p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {filtered.map(status => (
-                  <StatusCard
-                    key={status.id}
-                    status={status}
-                    onLog={logStatus}
-                    onLogCustom={handleLogCustom}
-                    disabled={logging}
-                    todayStats={todayStats[status.id]}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
         ) : (
-          // Context view: grouped sections
           <>
             {contextSections.map(({ context, statuses: ctxStatuses }) => (
               <section key={context.id} className="mb-6">
