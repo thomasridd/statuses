@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
-import { formatTime, formatStatusLabel } from '../lib/format'
+import { formatTime, formatDate, formatStatusLabel, todayISO } from '../lib/format'
 import StatusCard from '../components/StatusCard'
 import ValueModal from '../components/ValueModal'
 import Toast from '../components/Toast'
 import NavBar from '../components/NavBar'
+import DayNav from '../components/DayNav'
 import type { Status, LogEntry, Context } from '../types'
 
 interface StatusTodayStats {
@@ -46,22 +47,30 @@ export default function Home() {
   const [customEntry, setCustomEntry] = useState<Status | null>(null)
   const [logging, setLogging] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [selectedDate, setSelectedDate] = useState(todayISO())
+
+  const isActualToday = selectedDate === todayISO()
+
+  async function fetchDayLogs(date: string): Promise<LogEntry[]> {
+    if (date === todayISO()) {
+      const todayStart = getTodayStart()
+      const { logs } = await api.getLogs({ since: todayStart.toISOString() })
+      return logs
+    }
+    const { logs } = await api.getLogs({ date })
+    return logs
+  }
 
   const loadData = useCallback(async () => {
     try {
-      const todayStart = getTodayStart()
-      const [{ statuses: allStatuses }, { logs }, { contexts: allContexts }, { logs: todayLogs }] = await Promise.all([
+      const [{ statuses: allStatuses }, { contexts: allContexts }] = await Promise.all([
         api.getStatuses(),
-        api.getLogs({ limit: 20 }),
         api.getContexts(),
-        api.getLogs({ since: todayStart.toISOString() }),
       ])
 
       const enabled = allStatuses.filter(s => s.enabled && s.status_category !== 'badge')
       const map = Object.fromEntries(allStatuses.map(s => [s.id, s]))
       setStatusMap(map)
-      setRecentLogs(logs)
-      setTodayStats(computeTodayStats(todayLogs))
       setContexts(allContexts.sort((a, b) => a.order - b.order))
       setStatuses(enabled)
     } finally {
@@ -69,24 +78,39 @@ export default function Home() {
     }
   }, [])
 
+  const loadLogs = useCallback(async (date: string) => {
+    const isToday = date === todayISO()
+    const [dayLogs, recentResult] = await Promise.all([
+      fetchDayLogs(date),
+      isToday ? api.getLogs({ limit: 20 }) : api.getLogs({ date }),
+    ])
+    setTodayStats(computeTodayStats(dayLogs))
+    setRecentLogs(recentResult.logs)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     loadData()
   }, [loadData])
+
+  useEffect(() => {
+    loadLogs(selectedDate)
+  }, [selectedDate, loadLogs])
+
+  function backdatedTimestamp(date: string): string | undefined {
+    if (date === todayISO()) return undefined
+    return `${date}T12:00:00.000Z`
+  }
 
   async function logStatus(status: Status, value?: number) {
     setLogging(true)
     try {
       const logValue = value !== undefined ? value : (status.type === 'value' ? status.default_value ?? undefined : undefined)
-      await api.postLog(status.id, logValue)
+      const ts = backdatedTimestamp(selectedDate)
+      await api.postLog(status.id, logValue, ts)
       const label = formatStatusLabel(status, logValue ?? null)
       setToast(`Logged: ${label}`)
-      const todayStart = getTodayStart()
-      const [{ logs }, { logs: todayLogs }] = await Promise.all([
-        api.getLogs({ limit: 20 }),
-        api.getLogs({ since: todayStart.toISOString() }),
-      ])
-      setRecentLogs(logs)
-      setTodayStats(computeTodayStats(todayLogs))
+      await loadLogs(selectedDate)
     } catch {
       setToast('Error logging status')
     } finally {
@@ -106,7 +130,6 @@ export default function Home() {
 
   const enabledStatusIds = new Set(statuses.map(s => s.id))
 
-  // For contexts view: build context sections with their enabled statuses
   const contextSections = contexts.map(ctx => ({
     context: ctx,
     statuses: ctx.statuses
@@ -116,9 +139,10 @@ export default function Home() {
       .filter(Boolean) as Status[],
   })).filter(s => s.statuses.length > 0)
 
-  // Statuses not in any context
   const contextStatusIds = new Set(contexts.flatMap(ctx => ctx.statuses.map(m => m.status_id)))
   const ungroupedStatuses = statuses.filter(s => !contextStatusIds.has(s.id))
+
+  const activityTitle = isActualToday ? 'Recent activity' : 'Day activity'
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -127,9 +151,10 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-bold text-gray-900">Status Logger</h1>
             <Link to="/analytics" className="text-sm text-sky-600 font-medium">
-              Today's summary →
+              Summary →
             </Link>
           </div>
+          <DayNav date={selectedDate} onChange={setSelectedDate} />
         </div>
       </header>
 
@@ -180,7 +205,7 @@ export default function Home() {
 
             <section className="mt-2">
               <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                Recent activity
+                {activityTitle}
               </h2>
               {recentLogs.length === 0 ? (
                 <p className="text-gray-400 text-sm">No activity yet. Start logging above!</p>
@@ -197,6 +222,11 @@ export default function Home() {
                         <span className="text-xs text-gray-400 w-12 shrink-0 font-mono">
                           {formatTime(entry.timestamp)}
                         </span>
+                        {!isActualToday && (
+                          <span className="text-xs text-gray-300 shrink-0 font-mono">
+                            {formatDate(entry.timestamp)}
+                          </span>
+                        )}
                         <span className="text-sm text-gray-800 flex-1">
                           {formatStatusLabel(status, entry.value)}
                         </span>

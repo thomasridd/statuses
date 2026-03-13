@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../lib/api'
+import { todayISO } from '../lib/format'
 import GoldStarCard from '../components/GoldStarCard'
 import GoldStarModal from '../components/GoldStarModal'
 import Toast from '../components/Toast'
 import NavBar from '../components/NavBar'
+import DayNav from '../components/DayNav'
 import type { GoldStar } from '../types'
 
 function generateId(): string {
@@ -18,6 +20,9 @@ export default function Goals() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingGoal, setEditingGoal] = useState<GoldStar | null>(null)
   const [showCompleted, setShowCompleted] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(todayISO())
+
+  const isToday = selectedDate === todayISO()
 
   const loadData = useCallback(async () => {
     try {
@@ -56,20 +61,19 @@ export default function Goals() {
 
   async function handleModalSave(caption: string, notes: string) {
     setModalOpen(false)
+    const dateTs = isToday ? new Date().toISOString() : `${selectedDate}T12:00:00.000Z`
     if (editingGoal) {
-      // Edit existing
       const updated = goldStars.map(gs =>
         gs.id === editingGoal.id ? { ...gs, caption, notes } : gs
       )
       await save(updated)
       setToast('Goal updated')
     } else {
-      // Add new
       const newGoal: GoldStar = {
         id: generateId(),
         caption,
         notes,
-        created_at: new Date().toISOString(),
+        created_at: dateTs,
         order: goldStars.length + 1,
       }
       const updated = [...goldStars, newGoal]
@@ -79,8 +83,9 @@ export default function Goals() {
   }
 
   async function handleComplete(goal: GoldStar) {
+    const completedTs = isToday ? new Date().toISOString() : `${selectedDate}T12:00:00.000Z`
     const updated = goldStars.map(gs =>
-      gs.id === goal.id ? { ...gs, completed_at: new Date().toISOString() } : gs
+      gs.id === goal.id ? { ...gs, completed_at: completedTs } : gs
     )
     await save(updated)
     setToast(`Gold star! ${goal.caption} ⭐`)
@@ -93,15 +98,18 @@ export default function Goals() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40 safe-top">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">Goals ⭐</h1>
-          <button
-            className="text-sm font-medium text-amber-600 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 px-3 py-1.5 rounded-lg"
-            onClick={handleAddOpen}
-            disabled={saving}
-          >
-            + Add goal
-          </button>
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-bold text-gray-900">Goals ⭐</h1>
+            <button
+              className="text-sm font-medium text-amber-600 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 px-3 py-1.5 rounded-lg"
+              onClick={handleAddOpen}
+              disabled={saving}
+            >
+              + Add goal
+            </button>
+          </div>
+          <DayNav date={selectedDate} onChange={setSelectedDate} />
         </div>
       </header>
 
@@ -110,10 +118,15 @@ export default function Goals() {
           <div className="flex items-center justify-center py-16 text-gray-400">Loading…</div>
         ) : (
           <>
+            {!isToday && (
+              <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-sm text-amber-800">
+                Completing or adding goals will use the selected date.
+              </div>
+            )}
             {activeGoals.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-4xl mb-3">⭐</p>
-                <p className="text-gray-500 text-sm font-medium">No goals yet</p>
+                <p className="text-gray-500 text-sm font-medium">No active goals</p>
                 <p className="text-gray-400 text-xs mt-1">Add a domestic goal to work towards</p>
                 <button
                   className="mt-4 text-sm font-medium text-amber-600 bg-amber-50 hover:bg-amber-100 px-4 py-2 rounded-xl"

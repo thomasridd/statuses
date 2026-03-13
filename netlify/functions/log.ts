@@ -23,8 +23,8 @@ export default async (request: Request) => {
     })
   }
 
-  const body = await request.json() as { status_id?: string; value?: number }
-  const { status_id, value } = body
+  const body = await request.json() as { status_id?: string; value?: number; timestamp?: string }
+  const { status_id, value, timestamp } = body
 
   if (!status_id) {
     return new Response(JSON.stringify({ error: 'status_id is required' }), {
@@ -39,7 +39,7 @@ export default async (request: Request) => {
   const entry: LogEntry = {
     id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     status_id,
-    timestamp: new Date().toISOString(),
+    timestamp: timestamp || new Date().toISOString(),
     value: value !== undefined ? Number(value) : null,
   }
 

@@ -1,57 +1,58 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../lib/api'
+import { todayISO } from '../lib/format'
 import NavBar from '../components/NavBar'
 import Toast from '../components/Toast'
+import DayNav from '../components/DayNav'
 import type { Status, LogEntry } from '../types'
 
-function isToday(timestamp: string): boolean {
-  const d = new Date(timestamp)
-  const now = new Date()
-  return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
-  )
+function isOnDate(timestamp: string, dateStr: string): boolean {
+  return timestamp.startsWith(dateStr)
 }
 
 export default function Badges() {
   const [badges, setBadges] = useState<Status[]>([])
-  const [todayLogs, setTodayLogs] = useState<LogEntry[]>([])
+  const [dayLogs, setDayLogs] = useState<LogEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [logging, setLogging] = useState(false)
   const [toast, setToast] = useState('')
+  const [selectedDate, setSelectedDate] = useState(todayISO())
 
-  const loadData = useCallback(async () => {
-    try {
-      const [{ statuses }, { logs }] = await Promise.all([
-        api.getStatuses(),
-        api.getLogs({ limit: 200 }),
-      ])
-      setBadges(
-        statuses
-          .filter(s => s.status_category === 'badge' && s.enabled)
-          .sort((a, b) => a.order - b.order)
-      )
-      setTodayLogs(logs.filter(l => isToday(l.timestamp)))
-    } finally {
-      setLoading(false)
-    }
+  const loadBadges = useCallback(async () => {
+    const { statuses } = await api.getStatuses()
+    setBadges(
+      statuses
+        .filter(s => s.status_category === 'badge' && s.enabled)
+        .sort((a, b) => a.order - b.order)
+    )
+  }, [])
+
+  const loadDayLogs = useCallback(async (date: string) => {
+    const { logs } = await api.getLogs({ date })
+    setDayLogs(logs.filter(l => isOnDate(l.timestamp, date)))
   }, [])
 
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    setLoading(true)
+    Promise.all([loadBadges(), loadDayLogs(selectedDate)]).finally(() => setLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    loadDayLogs(selectedDate)
+  }, [selectedDate, loadDayLogs])
 
   async function toggleBadge(badge: Status) {
     if (logging) return
-    const alreadyEarned = todayLogs.some(l => l.status_id === badge.id)
+    const alreadyEarned = dayLogs.some(l => l.status_id === badge.id)
     if (alreadyEarned) return
     setLogging(true)
     try {
-      await api.postLog(badge.id)
+      const isToday = selectedDate === todayISO()
+      const timestamp = isToday ? undefined : `${selectedDate}T12:00:00.000Z`
+      await api.postLog(badge.id, undefined, timestamp)
       setToast(`Earned: ${badge.label}`)
-      const { logs } = await api.getLogs({ limit: 200 })
-      setTodayLogs(logs.filter(l => isToday(l.timestamp)))
+      await loadDayLogs(selectedDate)
     } catch {
       setToast('Error earning badge')
     } finally {
@@ -59,11 +60,12 @@ export default function Badges() {
     }
   }
 
-  const earnedIds = new Set(todayLogs.map(l => l.status_id))
+  const earnedIds = new Set(dayLogs.map(l => l.status_id))
   const positive = badges.filter(b => b.valence !== 'negative')
   const negative = badges.filter(b => b.valence === 'negative')
 
   const earnedCount = badges.filter(b => earnedIds.has(b.id)).length
+  const isToday = selectedDate === todayISO()
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -71,8 +73,13 @@ export default function Badges() {
         <div className="px-4 py-3">
           <h1 className="text-lg font-bold text-gray-900">Badges</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            {badges.length === 0 ? 'No badges configured' : earnedCount === 0 ? 'Tap a badge to earn it today' : `${earnedCount} of ${badges.length} earned today`}
+            {badges.length === 0
+              ? 'No badges configured'
+              : earnedCount === 0
+              ? isToday ? 'Tap a badge to earn it today' : 'No badges earned this day'
+              : `${earnedCount} of ${badges.length} earned`}
           </p>
+          <DayNav date={selectedDate} onChange={setSelectedDate} />
         </div>
       </header>
 
