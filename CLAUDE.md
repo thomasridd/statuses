@@ -122,8 +122,8 @@ All endpoints require `x-app-password` header.
 ## Home page behaviour
 
 - **"Today" boundary:** 4:30 AM — if the current time is before 4:30 AM, "today" means the previous calendar day
-- **No search:** statuses shown grouped by context (context order → status order within context); badge statuses are excluded
-- **Searching:** flat filtered list across all enabled non-badge statuses
+- Statuses shown grouped by context (context order → status order within context); badge statuses are excluded
+- Statuses not in any context appear under *Other*
 - Each status has a single **Log** button:
   - Simple status → logs immediately on tap
   - Value status → opens `ValueModal` to enter/confirm the value (default pre-filled)
